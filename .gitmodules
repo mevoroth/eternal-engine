@@ -1,0 +1,6 @@
+[submodule "eternal-engine-graphics"]
+	path = eternal-engine-graphics
+	url = git@github.com:mevoroth/eternal-engine-graphics.git
+[submodule "eternal-engine-utils"]
+	path = eternal-engine-utils
+	url = git@github.com:mevoroth/eternal-engine-utils.git
