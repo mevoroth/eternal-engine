@@ -7,6 +7,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "eternal-engine-graphics", "
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "eternal-engine-utils", "eternal-engine-utils\eternal-engine-utils.vcxproj", "{23D5DF8E-B7C8-40C2-B797-8C06280D1F24}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "eternal-engine-sandbox", "eternal-engine-sandbox\eternal-engine-sandbox.vcxproj", "{6773D9B2-1D0F-482A-A856-DC9C24ABF810}"
+	ProjectSection(ProjectDependencies) = postProject
+		{7BFECF84-04D0-4BBC-BCB9-DA51D5564E95} = {7BFECF84-04D0-4BBC-BCB9-DA51D5564E95}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -21,6 +26,10 @@ Global
 		{23D5DF8E-B7C8-40C2-B797-8C06280D1F24}.Debug|Win32.Build.0 = Debug|Win32
 		{23D5DF8E-B7C8-40C2-B797-8C06280D1F24}.Release|Win32.ActiveCfg = Release|Win32
 		{23D5DF8E-B7C8-40C2-B797-8C06280D1F24}.Release|Win32.Build.0 = Release|Win32
+		{6773D9B2-1D0F-482A-A856-DC9C24ABF810}.Debug|Win32.ActiveCfg = Debug|Win32
+		{6773D9B2-1D0F-482A-A856-DC9C24ABF810}.Debug|Win32.Build.0 = Debug|Win32
+		{6773D9B2-1D0F-482A-A856-DC9C24ABF810}.Release|Win32.ActiveCfg = Release|Win32
+		{6773D9B2-1D0F-482A-A856-DC9C24ABF810}.Release|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
