@@ -10,6 +10,7 @@
 #include "d3d11/D3D11GeometryShader.hpp"
 #include "d3d11/D3D11PixelShader.hpp"
 #include "d3d11/D3D11BlendState.hpp"
+#include "d3d11/D3D11Viewport.hpp"
 #include "d3d11/D3D11VertexPosNormTex.hpp"
 
 using namespace Eternal::Graphics;
@@ -51,6 +52,8 @@ int WINAPI WinMain(HINSTANCE hInstance,
 	//MaterialProperty::ParamType::
 	//MaterialProperty matProp("",);
 	//mat.SetMaterialDesc()
+	D3D11Viewport viewport(0, 0, D3D11DeviceType::WIDTH, D3D11DeviceType::HEIGHT);
+	renderer.SetViewport(&viewport);
 
 	D3D11VertexPosNormTex v[4];
 
@@ -100,13 +103,18 @@ int WINAPI WinMain(HINSTANCE hInstance,
 	//	7, 2, 3
 	//};
 
+	float i = 0;
+
 	while (true)
 	{
+		camera.SetModelMatrix({ XMMatrixTranslation(0.01f * i, 0.f, 0.f) });
+		//camera.SetModelMatrix()
 		renderer.ClearRenderTargets(&backBuffer, 1);
 		renderer.AttachMaterial(&mat);
 		//renderer.DrawIndexed(cube, 8, sizeof(D3D11VertexPosNormTex), indices, 36);
 		renderer.DrawIndexed(v, 4, sizeof(D3D11VertexPosNormTex), indices, 6);
 		renderer.Flush();
+		++i;
 	}
 
 	return 0;

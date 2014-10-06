@@ -4,3 +4,6 @@
 [submodule "eternal-engine-utils"]
 	path = eternal-engine-utils
 	url = git@github.com:mevoroth/eternal-engine-utils.git
+[submodule "eternal-engine-components"]
+	path = eternal-engine-components
+	url = git@github.com:mevoroth/eternal-engine-components.git
