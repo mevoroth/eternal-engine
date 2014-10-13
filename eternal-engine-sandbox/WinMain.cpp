@@ -13,6 +13,8 @@
 #include "d3d11/D3D11Viewport.hpp"
 #include "d3d11/D3D11VertexPosNormTex.hpp"
 
+#include "Mesh/Mesh.hpp"
+
 using namespace Eternal::Graphics;
 
 int WINAPI WinMain(HINSTANCE hInstance,
