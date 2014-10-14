@@ -14,14 +14,20 @@
 #include "d3d11/D3D11VertexPosNormTex.hpp"
 
 #include "Mesh/Mesh.hpp"
+#include "Import/fbx/ImportFbx.hpp"
 
 using namespace Eternal::Graphics;
+using namespace Eternal::Import;
 
 int WINAPI WinMain(HINSTANCE hInstance,
 	HINSTANCE hPrevInstance,
 	LPSTR lpCmdLine,
 	int nCmdShow)
 {
+	new ImportFbx();
+	Eternal::Components::Mesh mesh = ImportFbx::Get()->Import("mesh.test.fbx");
+	printf("test");
+
 	D3D11DeviceType device(
 		new D3D11Device(hInstance, nCmdShow, "Eternal Sandbox", "EternalClass")
 	);
