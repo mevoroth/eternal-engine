@@ -4,12 +4,21 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 12.0.30110.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "eternal-engine-graphics", "eternal-engine-graphics\eternal-engine-graphics.vcxproj", "{7BFECF84-04D0-4BBC-BCB9-DA51D5564E95}"
+	ProjectSection(ProjectDependencies) = postProject
+		{8A5A5437-7E81-42BC-9DA7-1693D20B73BA} = {8A5A5437-7E81-42BC-9DA7-1693D20B73BA}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "eternal-engine-utils", "eternal-engine-utils\eternal-engine-utils.vcxproj", "{23D5DF8E-B7C8-40C2-B797-8C06280D1F24}"
+	ProjectSection(ProjectDependencies) = postProject
+		{8A5A5437-7E81-42BC-9DA7-1693D20B73BA} = {8A5A5437-7E81-42BC-9DA7-1693D20B73BA}
+		{7BFECF84-04D0-4BBC-BCB9-DA51D5564E95} = {7BFECF84-04D0-4BBC-BCB9-DA51D5564E95}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "eternal-engine-sandbox", "eternal-engine-sandbox\eternal-engine-sandbox.vcxproj", "{6773D9B2-1D0F-482A-A856-DC9C24ABF810}"
 	ProjectSection(ProjectDependencies) = postProject
+		{8A5A5437-7E81-42BC-9DA7-1693D20B73BA} = {8A5A5437-7E81-42BC-9DA7-1693D20B73BA}
 		{7BFECF84-04D0-4BBC-BCB9-DA51D5564E95} = {7BFECF84-04D0-4BBC-BCB9-DA51D5564E95}
+		{23D5DF8E-B7C8-40C2-B797-8C06280D1F24} = {23D5DF8E-B7C8-40C2-B797-8C06280D1F24}
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "eternal-engine-components", "eternal-engine-components\eternal-engine-components.vcxproj", "{8A5A5437-7E81-42BC-9DA7-1693D20B73BA}"

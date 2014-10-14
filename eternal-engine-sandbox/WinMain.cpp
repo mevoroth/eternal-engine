@@ -11,7 +11,6 @@
 #include "d3d11/D3D11PixelShader.hpp"
 #include "d3d11/D3D11BlendState.hpp"
 #include "d3d11/D3D11Viewport.hpp"
-#include "d3d11/D3D11VertexPosNormTex.hpp"
 
 #include "Mesh/Mesh.hpp"
 #include "Import/fbx/ImportFbx.hpp"
@@ -25,7 +24,7 @@ int WINAPI WinMain(HINSTANCE hInstance,
 	int nCmdShow)
 {
 	new ImportFbx();
-	Eternal::Components::Mesh mesh = ImportFbx::Get()->Import("mesh.test.fbx");
+	Eternal::Components::Mesh mesh = ImportFbx::Get()->Import("C:\\Users\\skana\\Documents\\Visual Studio 2013\\Projects\\eternal-engine\\Debug\\mesh.test.fbx");
 	printf("test");
 
 	D3D11DeviceType device(
@@ -47,7 +46,7 @@ int WINAPI WinMain(HINSTANCE hInstance,
 	renderer.AttachRenderTargets(&backBuffer, 1);
 	renderer.SetBlendMode(&blendState);
 	D3D11Material mat;
-	D3D11InputLayout inputLayout((D3D11InputLayout::VertexDataType)(D3D11InputLayout::POSITION_T | D3D11InputLayout::NORMAL_T | D3D11InputLayout::TEXCOORD_T));
+	D3D11InputLayout inputLayout((D3D11InputLayout::VertexDataType)(D3D11InputLayout::POSITION_T /*| D3D11InputLayout::NORMAL_T*/ | D3D11InputLayout::TEXCOORD_T));
 	D3D11VertexShader vs("default", "default.vs.hlsl", inputLayout);
 	D3D11GeometryShader gs("default", "default.gs.hlsl");
 	D3D11PixelShader ps("default", "default.ps.hlsl");
@@ -63,23 +62,23 @@ int WINAPI WinMain(HINSTANCE hInstance,
 	D3D11Viewport viewport(0, 0, D3D11DeviceType::WIDTH, D3D11DeviceType::HEIGHT);
 	renderer.SetViewport(&viewport);
 
-	D3D11VertexPosNormTex v[4];
+	Vertex v[4];
 
 	v[0].Pos = XMVectorSet(0.f, 100.f, 0.f, 1.f);
 	v[0].Tex = XMFLOAT2(0.f, 0.f);
-	v[0].Norm = XMFLOAT3(0.f, -1.f, 0.f);
+	//v[0].Norm = XMFLOAT3(0.f, -1.f, 0.f);
 
 	v[1].Pos = XMVectorSet(0.f, 100.f, 200.f, 1.f);
 	v[1].Tex = XMFLOAT2(1.f, 0.f);
-	v[1].Norm = XMFLOAT3(0.f, -1.f, 0.f);
+	//v[1].Norm = XMFLOAT3(0.f, -1.f, 0.f);
 	
 	v[2].Pos = XMVectorSet(200.f, 100.f, 200.f, 1.f);
 	v[2].Tex = XMFLOAT2(1.f, 1.f);
-	v[2].Norm = XMFLOAT3(0.f, -1.f, 0.f);
+	//v[2].Norm = XMFLOAT3(0.f, -1.f, 0.f);
 
 	v[3].Pos = XMVectorSet(200.f, 100.f, 0.f, 1.f);
 	v[3].Tex = XMFLOAT2(0.f, 1.f);
-	v[3].Norm = XMFLOAT3(0.f, -1.f, 0.f);
+	//v[3].Norm = XMFLOAT3(0.f, -1.f, 0.f);
 
 	uint16_t indices[6] = {
 		0, 1, 2,
@@ -120,7 +119,7 @@ int WINAPI WinMain(HINSTANCE hInstance,
 		renderer.ClearRenderTargets(&backBuffer, 1);
 		renderer.AttachMaterial(&mat);
 		//renderer.DrawIndexed(cube, 8, sizeof(D3D11VertexPosNormTex), indices, 36);
-		renderer.DrawIndexed(v, 4, sizeof(D3D11VertexPosNormTex), indices, 6);
+		renderer.DrawIndexed(v, 4, sizeof(Vertex), indices, 6);
 		renderer.Flush();
 		++i;
 	}
