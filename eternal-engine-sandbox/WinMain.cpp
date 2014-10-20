@@ -1,22 +1,38 @@
 #include <Windows.h>
 
-#include "d3d11/D3D11Device.hpp"
-#include "d3d11/D3D11Renderer.hpp"
-#include "d3d11/D3D11OrthographicCamera.hpp"
-#include "d3d11/D3D11PerspectiveCamera.hpp"
-#include "d3d11/D3D11Material.hpp"
-#include "d3d11/D3D11InputLayout.hpp"
-#include "d3d11/D3D11VertexShader.hpp"
-#include "d3d11/D3D11GeometryShader.hpp"
-#include "d3d11/D3D11PixelShader.hpp"
-#include "d3d11/D3D11BlendState.hpp"
-#include "d3d11/D3D11Viewport.hpp"
+//#include "d3d11/D3D11Device.hpp"
+//#include "d3d11/D3D11Renderer.hpp"
+//#include "d3d11/D3D11OrthographicCamera.hpp"
+//#include "d3d11/D3D11PerspectiveCamera.hpp"
+//#include "d3d11/D3D11Material.hpp"
+//#include "d3d11/D3D11InputLayout.hpp"
+//#include "d3d11/D3D11VertexShader.hpp"
+//#include "d3d11/D3D11GeometryShader.hpp"
+//#include "d3d11/D3D11PixelShader.hpp"
+//#include "d3d11/D3D11BlendState.hpp"
+//#include "d3d11/D3D11Viewport.hpp"
+
+#include "d3d10/D3D10Device.hpp"
+#include "d3d10/D3D10Renderer.hpp"
+#include "d3d10/D3D10OrthographicCamera.hpp"
+//#include "d3d10/D3D10PerspectiveCamera.hpp"
+#include "d3d10/D3D10Material.hpp"
+#include "d3d10/D3D10InputLayout.hpp"
+#include "d3d10/D3D10VertexShader.hpp"
+#include "d3d10/D3D10GeometryShader.hpp"
+#include "d3d10/D3D10PixelShader.hpp"
+#include "d3d10/D3D10BlendState.hpp"
+#include "d3d10/D3D10Viewport.hpp"
 
 #include "Mesh/Mesh.hpp"
 #include "Import/fbx/ImportFbx.hpp"
 
+#include <stack>
+
 using namespace Eternal::Graphics;
 using namespace Eternal::Import;
+
+void DrawMeshes(Renderer* renderer, const Mesh* mesh);
 
 int WINAPI WinMain(HINSTANCE hInstance,
 	HINSTANCE hPrevInstance,
@@ -25,43 +41,48 @@ int WINAPI WinMain(HINSTANCE hInstance,
 {
 	new ImportFbx();
 	Eternal::Components::Mesh mesh = ImportFbx::Get()->Import("C:\\Users\\skana\\Documents\\Visual Studio 2013\\Projects\\eternal-engine\\Debug\\mesh.test.fbx");
-	printf("test");
+	//printf("test");
 
-	D3D11DeviceType device(
-		new D3D11Device(hInstance, nCmdShow, "Eternal Sandbox", "EternalClass")
-	);
-	device.Get()->Create();
 
-	//D3D11Renderer* renderer = new D3D11Renderer();
-	D3D11Renderer renderer;
+	//new D3D11Device(hInstance, nCmdShow, "Eternal Sandbox", "EternalClass");
+	//static_cast<D3D11Device*>(Device::Get())->Create();
+	new D3D10Device(hInstance, nCmdShow, "Eternal SandBox", "EternalClass");
+	static_cast<D3D10Device*>(Device::Get())->Create();
+
+	//D3D11Renderer renderer;
+	D3D10Renderer renderer;
 
 	D3D11OrthographicCamera camera;
+	//D3D11OrthographicCamera camera;
 	//D3D11PerspectiveCamera camera;
-	D3D11Material material;
 
 	RenderTarget* backBuffer = renderer.GetBackBuffer();
-	D3D11BlendState blendState(BlendState::SRC_ALPHA, BlendState::INV_SRC_ALPHA, BlendState::OP_ADD,
+	//D3D11BlendState blendState(BlendState::SRC_ALPHA, BlendState::INV_SRC_ALPHA, BlendState::OP_ADD,
+	//	BlendState::SRC_ALPHA, BlendState::INV_DEST_ALPHA, BlendState::OP_ADD);
+	D3D10BlendState blendState(BlendState::SRC_ALPHA, BlendState::INV_SRC_ALPHA, BlendState::OP_ADD,
 		BlendState::SRC_ALPHA, BlendState::INV_DEST_ALPHA, BlendState::OP_ADD);
 	renderer.AttachCamera(&camera);
 	renderer.AttachRenderTargets(&backBuffer, 1);
 	renderer.SetBlendMode(&blendState);
-	D3D11Material mat;
-	D3D11InputLayout inputLayout((D3D11InputLayout::VertexDataType)(D3D11InputLayout::POSITION_T /*| D3D11InputLayout::NORMAL_T*/ | D3D11InputLayout::TEXCOORD_T));
-	D3D11VertexShader vs("default", "default.vs.hlsl", inputLayout);
-	D3D11GeometryShader gs("default", "default.gs.hlsl");
-	D3D11PixelShader ps("default", "default.ps.hlsl");
+	//D3D11Material mat;
+	D3D10Material mat;
+	//D3D11InputLayout inputLayout((D3D11InputLayout::VertexDataType)(D3D11InputLayout::POSITION_T /*| D3D11InputLayout::NORMAL_T*/ | D3D11InputLayout::TEXCOORD_T));
+	D3D10InputLayout inputLayout((D3D10InputLayout::VertexDataType)(D3D10InputLayout::POSITION_T /*| D3D11InputLayout::NORMAL_T*/ | D3D10InputLayout::TEXCOORD_T));
+	//D3D11VertexShader vs("default", "default.vs.hlsl", inputLayout);
+	//D3D11GeometryShader gs("default", "default.gs.hlsl");
+	//D3D11PixelShader ps("default", "default.ps.hlsl");
+	D3D10VertexShader vs("default", "default.vs.hlsl", inputLayout);
+	D3D10GeometryShader gs("default", "default.gs.hlsl");
+	D3D10PixelShader ps("default", "default.ps.hlsl");
 	mat.AttachInputLayout(&inputLayout);
 	mat.AttachVertexShader(&vs);
 	mat.AttachGeometryShader(&gs);
 	mat.AttachPixelShader(&ps);
 	mat.Apply();
-	//mat.
-	//MaterialProperty::ParamType::
-	//MaterialProperty matProp("",);
-	//mat.SetMaterialDesc()
-	D3D11Viewport viewport(0, 0, D3D11DeviceType::WIDTH, D3D11DeviceType::HEIGHT);
-	renderer.SetViewport(&viewport);
 
+	//D3D11Viewport viewport(0, 0, Device::WIDTH, Device::HEIGHT);
+	D3D10Viewport viewport(0, 0, Device::WIDTH, Device::HEIGHT);
+	renderer.SetViewport(&viewport);
 	Vertex v[4];
 
 	v[0].Pos = XMVectorSet(0.f, 100.f, 0.f, 1.f);
@@ -119,10 +140,28 @@ int WINAPI WinMain(HINSTANCE hInstance,
 		renderer.ClearRenderTargets(&backBuffer, 1);
 		renderer.AttachMaterial(&mat);
 		//renderer.DrawIndexed(cube, 8, sizeof(D3D11VertexPosNormTex), indices, 36);
-		renderer.DrawIndexed(v, 4, sizeof(Vertex), indices, 6);
+		//renderer.DrawIndexed(v, 4, sizeof(Vertex), indices, 6);
+
+		DrawMeshes(&renderer, &mesh);
+		//for (int i = 0; i < )
+			//renderer.DrawIndexed(mesh.GetVertices(), mesh.GetVerticesCount(), sizeof(Vertex), mesh.GetIndices(), mesh.GetIndicesCount());
 		renderer.Flush();
 		++i;
 	}
 
 	return 0;
+}
+
+void DrawMeshes(Renderer* renderer, const Mesh* mesh)
+{
+	renderer->LoadMatrix(mesh->GetTransform().GetModelMatrix());
+	if (mesh->GetVerticesCount() > 0)
+	{
+		renderer->DrawIndexed(mesh->GetVertices(), mesh->GetVerticesCount(), sizeof(Vertex), mesh->GetIndices(), mesh->GetIndicesCount());
+	}
+	
+	for (int i = 0, c = mesh->GetSubMeshesCount(); i < c; ++i)
+	{
+		DrawMeshes(renderer, &mesh->GetSubMeshes()[i]);
+	}
 }
