@@ -24,10 +24,14 @@
 #include "d3d10/D3D10BlendState.hpp"
 #include "d3d10/D3D10Viewport.hpp"
 
+//#include "opengl/OGLDevice.hpp"
+//#include "opengl/OGLRenderer.hpp"
+
 #include "Mesh/Mesh.hpp"
 #include "Import/fbx/ImportFbx.hpp"
 
 #include <stack>
+#include <gl/GL.h>
 
 using namespace Eternal::Graphics;
 using namespace Eternal::Import;
@@ -48,12 +52,16 @@ int WINAPI WinMain(HINSTANCE hInstance,
 	//static_cast<D3D11Device*>(Device::Get())->Create();
 	new D3D10Device(hInstance, nCmdShow, "Eternal SandBox", "EternalClass");
 	static_cast<D3D10Device*>(Device::Get())->Create();
+	//new OGLDevice(hInstance, nCmdShow, "Eternal SandBox", "EternalClass");
+	//static_cast<OGLDevice*>(Device::Get())->Create();
 
 	//D3D11Renderer renderer;
-	D3D10Renderer renderer;
+	D3D10Renderer renderer(Renderer::HARDWARE, Renderer::NO_AA);
+	//OGLRenderer renderer;
 
-	D3D11OrthographicCamera camera;
 	//D3D11OrthographicCamera camera;
+	D3D10OrthographicCamera camera;
+	//OGLOrthographicCamera camera;
 	//D3D11PerspectiveCamera camera;
 
 	RenderTarget* backBuffer = renderer.GetBackBuffer();
@@ -92,7 +100,7 @@ int WINAPI WinMain(HINSTANCE hInstance,
 	v[1].Pos = XMVectorSet(0.f, 100.f, 200.f, 1.f);
 	v[1].Tex = XMFLOAT2(1.f, 0.f);
 	//v[1].Norm = XMFLOAT3(0.f, -1.f, 0.f);
-	
+
 	v[2].Pos = XMVectorSet(200.f, 100.f, 200.f, 1.f);
 	v[2].Tex = XMFLOAT2(1.f, 1.f);
 	//v[2].Norm = XMFLOAT3(0.f, -1.f, 0.f);
@@ -135,14 +143,19 @@ int WINAPI WinMain(HINSTANCE hInstance,
 
 	while (true)
 	{
-		camera.SetModelMatrix({ XMMatrixTranslation(0.01f * i, 0.f, 0.f) });
+		camera.SetModelMatrix(XMMatrixTranslation(0.1f * i, 0.f, 0.f));
 		//camera.SetModelMatrix()
 		renderer.ClearRenderTargets(&backBuffer, 1);
-		renderer.AttachMaterial(&mat);
+		//renderer.AttachMaterial(&mat);
 		//renderer.DrawIndexed(cube, 8, sizeof(D3D11VertexPosNormTex), indices, 36);
+		//renderer.PushContext();
+		//renderer.LoadMatrix(NewIdentity());
 		//renderer.DrawIndexed(v, 4, sizeof(Vertex), indices, 6);
+		//renderer.PopContext();
 
+		renderer.PushContext();
 		DrawMeshes(&renderer, &mesh);
+		renderer.PopContext();
 		//for (int i = 0; i < )
 			//renderer.DrawIndexed(mesh.GetVertices(), mesh.GetVerticesCount(), sizeof(Vertex), mesh.GetIndices(), mesh.GetIndicesCount());
 		renderer.Flush();
@@ -159,9 +172,11 @@ void DrawMeshes(Renderer* renderer, const Mesh* mesh)
 	{
 		renderer->DrawIndexed(mesh->GetVertices(), mesh->GetVerticesCount(), sizeof(Vertex), mesh->GetIndices(), mesh->GetIndicesCount());
 	}
-	
+
 	for (int i = 0, c = mesh->GetSubMeshesCount(); i < c; ++i)
 	{
+		renderer->PushContext();
 		DrawMeshes(renderer, &mesh->GetSubMeshes()[i]);
+		renderer->PopContext();
 	}
 }
