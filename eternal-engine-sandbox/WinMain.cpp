@@ -30,11 +30,14 @@
 #include "Mesh/Mesh.hpp"
 #include "Import/fbx/ImportFbx.hpp"
 
+#include "Input/Win/WinInput.hpp"
+
 #include <stack>
 #include <gl/GL.h>
 
 using namespace Eternal::Graphics;
 using namespace Eternal::Import;
+using namespace Eternal::Input;
 
 void DrawMeshes(Renderer* renderer, const Mesh* mesh);
 
@@ -43,6 +46,8 @@ int WINAPI WinMain(HINSTANCE hInstance,
 	LPSTR lpCmdLine,
 	int nCmdShow)
 {
+	new Eternal::Input::WinInput();
+
 	new ImportFbx();
 	Eternal::Components::Mesh mesh = ImportFbx::Get()->Import("C:\\Users\\skana\\Documents\\Visual Studio 2013\\Projects\\eternal-engine\\Debug\\mesh.test.fbx");
 	//printf("test");
@@ -143,19 +148,21 @@ int WINAPI WinMain(HINSTANCE hInstance,
 
 	while (true)
 	{
-		camera.SetModelMatrix(XMMatrixTranslation(0.1f * i, 0.f, 0.f));
+		Input::Get()->Update();
+
+		camera.SetModelMatrix(XMMatrixTranslation(0.f, -100.f * Input::Get()->GetAxis(Input::JOY0_LX), 0.f));
 		//camera.SetModelMatrix()
 		renderer.ClearRenderTargets(&backBuffer, 1);
 		//renderer.AttachMaterial(&mat);
 		//renderer.DrawIndexed(cube, 8, sizeof(D3D11VertexPosNormTex), indices, 36);
-		//renderer.PushContext();
-		//renderer.LoadMatrix(NewIdentity());
-		//renderer.DrawIndexed(v, 4, sizeof(Vertex), indices, 6);
-		//renderer.PopContext();
-
 		renderer.PushContext();
-		DrawMeshes(&renderer, &mesh);
+		renderer.LoadMatrix(NewIdentity());
+		renderer.DrawIndexed(v, 4, sizeof(Vertex), indices, 6);
 		renderer.PopContext();
+
+		//renderer.PushContext();
+		//DrawMeshes(&renderer, &mesh);
+		//renderer.PopContext();
 		//for (int i = 0; i < )
 			//renderer.DrawIndexed(mesh.GetVertices(), mesh.GetVerticesCount(), sizeof(Vertex), mesh.GetIndices(), mesh.GetIndicesCount());
 		renderer.Flush();
