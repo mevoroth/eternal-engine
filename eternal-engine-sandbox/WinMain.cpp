@@ -15,7 +15,7 @@
 #include "d3d10/D3D10Device.hpp"
 #include "d3d10/D3D10Renderer.hpp"
 #include "d3d10/D3D10OrthographicCamera.hpp"
-//#include "d3d10/D3D10PerspectiveCamera.hpp"
+#include "d3d10/D3D10PerspectiveCamera.hpp"
 #include "d3d10/D3D10Material.hpp"
 #include "d3d10/D3D10InputLayout.hpp"
 #include "d3d10/D3D10VertexShader.hpp"
@@ -68,6 +68,7 @@ int WINAPI WinMain(HINSTANCE hInstance,
 	D3D10OrthographicCamera camera;
 	//OGLOrthographicCamera camera;
 	//D3D11PerspectiveCamera camera;
+	//D3D10PerspectiveCamera camera;
 
 	RenderTarget* backBuffer = renderer.GetBackBuffer();
 	//D3D11BlendState blendState(BlendState::SRC_ALPHA, BlendState::INV_SRC_ALPHA, BlendState::OP_ADD,
@@ -150,9 +151,9 @@ int WINAPI WinMain(HINSTANCE hInstance,
 	{
 		Input::Get()->Update();
 
-		camera.SetModelMatrix(XMMatrixTranslation(0.f, -100.f * Input::Get()->GetAxis(Input::JOY0_LX), 0.f));
+		//camera.SetModelMatrix(XMMatrixTranslation(500.f * Input::Get()->GetAxis(Input::JOY0_LX), -500.f * Input::Get()->GetAxis(Input::JOY0_LY), 1000.f * Input::Get()->GetAxis(Input::JOY0_RY)));
 		//camera.SetModelMatrix()
-		renderer.ClearRenderTargets(&backBuffer, 1);
+		//renderer.ClearRenderTargets(&backBuffer, 1);
 		//renderer.AttachMaterial(&mat);
 		//renderer.DrawIndexed(cube, 8, sizeof(D3D11VertexPosNormTex), indices, 36);
 		renderer.PushContext();
@@ -163,8 +164,7 @@ int WINAPI WinMain(HINSTANCE hInstance,
 		//renderer.PushContext();
 		//DrawMeshes(&renderer, &mesh);
 		//renderer.PopContext();
-		//for (int i = 0; i < )
-			//renderer.DrawIndexed(mesh.GetVertices(), mesh.GetVerticesCount(), sizeof(Vertex), mesh.GetIndices(), mesh.GetIndicesCount());
+
 		renderer.Flush();
 		++i;
 	}
@@ -174,7 +174,7 @@ int WINAPI WinMain(HINSTANCE hInstance,
 
 void DrawMeshes(Renderer* renderer, const Mesh* mesh)
 {
-	renderer->LoadMatrix(mesh->GetTransform().GetModelMatrix());
+	renderer->MulMatrix(mesh->GetTransform().GetModelMatrix());
 	if (mesh->GetVerticesCount() > 0)
 	{
 		renderer->DrawIndexed(mesh->GetVertices(), mesh->GetVerticesCount(), sizeof(Vertex), mesh->GetIndices(), mesh->GetIndicesCount());
