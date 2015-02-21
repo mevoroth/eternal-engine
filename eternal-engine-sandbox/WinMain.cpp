@@ -90,7 +90,7 @@ int WINAPI WinMain(HINSTANCE hInstance,
 	D3D10PixelShader ps("default", "default.ps.hlsl");
 	mat.AttachInputLayout(&inputLayout);
 	mat.AttachVertexShader(&vs);
-	mat.AttachGeometryShader(&gs);
+	//mat.AttachGeometryShader(&gs);
 	mat.AttachPixelShader(&ps);
 	mat.Apply();
 
@@ -99,19 +99,19 @@ int WINAPI WinMain(HINSTANCE hInstance,
 	renderer.SetViewport(&viewport);
 	Vertex v[4];
 
-	v[0].Pos = XMVectorSet(0.f, 100.f, 0.f, 1.f);
+	v[0].Pos = XMVectorSet(0.f, 0.f, 0.1f, 1.f);
 	v[0].Tex = XMFLOAT2(0.f, 0.f);
 	//v[0].Norm = XMFLOAT3(0.f, -1.f, 0.f);
 
-	v[1].Pos = XMVectorSet(0.f, 100.f, 200.f, 1.f);
+	v[1].Pos = XMVectorSet(100.f, 0.f, 0.1f, 1.f);
 	v[1].Tex = XMFLOAT2(1.f, 0.f);
 	//v[1].Norm = XMFLOAT3(0.f, -1.f, 0.f);
 
-	v[2].Pos = XMVectorSet(200.f, 100.f, 200.f, 1.f);
+	v[2].Pos = XMVectorSet(100.f, 100.f, 0.1f, 1.f);
 	v[2].Tex = XMFLOAT2(1.f, 1.f);
 	//v[2].Norm = XMFLOAT3(0.f, -1.f, 0.f);
 
-	v[3].Pos = XMVectorSet(200.f, 100.f, 0.f, 1.f);
+	v[3].Pos = XMVectorSet(0.f, 100.f, 0.1f, 1.f);
 	v[3].Tex = XMFLOAT2(0.f, 1.f);
 	//v[3].Norm = XMFLOAT3(0.f, -1.f, 0.f);
 
@@ -156,10 +156,10 @@ int WINAPI WinMain(HINSTANCE hInstance,
 		//renderer.ClearRenderTargets(&backBuffer, 1);
 		//renderer.AttachMaterial(&mat);
 		//renderer.DrawIndexed(cube, 8, sizeof(D3D11VertexPosNormTex), indices, 36);
-		renderer.PushContext();
-		renderer.LoadMatrix(NewIdentity());
+		//renderer.PushContext();
+		//renderer.LoadMatrix(NewIdentity());
 		renderer.DrawIndexed(v, 4, sizeof(Vertex), indices, 6);
-		renderer.PopContext();
+		//renderer.PopContext();
 
 		//renderer.PushContext();
 		//DrawMeshes(&renderer, &mesh);
