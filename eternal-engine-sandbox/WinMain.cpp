@@ -49,7 +49,7 @@ int WINAPI WinMain(HINSTANCE hInstance,
 	new Eternal::Input::WinInput();
 
 	new ImportFbx();
-	Eternal::Components::Mesh mesh = ImportFbx::Get()->Import("C:\\Users\\skana\\Documents\\Visual Studio 2013\\Projects\\eternal-engine\\Debug\\mesh.test.fbx");
+	Eternal::Components::Mesh mesh = ImportFbx::Get()->Import("mesh.test.fbx");
 	//printf("test");
 
 
@@ -65,10 +65,10 @@ int WINAPI WinMain(HINSTANCE hInstance,
 	//OGLRenderer renderer;
 
 	//D3D11OrthographicCamera camera;
-	D3D10OrthographicCamera camera;
+	//D3D10OrthographicCamera camera;
 	//OGLOrthographicCamera camera;
 	//D3D11PerspectiveCamera camera;
-	//D3D10PerspectiveCamera camera;
+	D3D10PerspectiveCamera camera;
 
 	RenderTarget* backBuffer = renderer.GetBackBuffer();
 	//D3D11BlendState blendState(BlendState::SRC_ALPHA, BlendState::INV_SRC_ALPHA, BlendState::OP_ADD,
@@ -90,7 +90,7 @@ int WINAPI WinMain(HINSTANCE hInstance,
 	D3D10PixelShader ps("default", "default.ps.hlsl");
 	mat.AttachInputLayout(&inputLayout);
 	mat.AttachVertexShader(&vs);
-	//mat.AttachGeometryShader(&gs);
+	mat.AttachGeometryShader(&gs);
 	mat.AttachPixelShader(&ps);
 	mat.Apply();
 
@@ -99,19 +99,19 @@ int WINAPI WinMain(HINSTANCE hInstance,
 	renderer.SetViewport(&viewport);
 	Vertex v[4];
 
-	v[0].Pos = XMVectorSet(0.f, 0.f, 0.1f, 1.f);
+	v[0].Pos = XMVectorSet(0.f, 0.f, 1.f, 1.f);
 	v[0].Tex = XMFLOAT2(0.f, 0.f);
 	//v[0].Norm = XMFLOAT3(0.f, -1.f, 0.f);
 
-	v[1].Pos = XMVectorSet(100.f, 0.f, 0.1f, 1.f);
+	v[1].Pos = XMVectorSet(0.5f, 0.f, 1.f, 1.f);
 	v[1].Tex = XMFLOAT2(1.f, 0.f);
 	//v[1].Norm = XMFLOAT3(0.f, -1.f, 0.f);
 
-	v[2].Pos = XMVectorSet(100.f, 100.f, 0.1f, 1.f);
+	v[2].Pos = XMVectorSet(0.5f, 0.5f, 1.f, 1.f);
 	v[2].Tex = XMFLOAT2(1.f, 1.f);
 	//v[2].Norm = XMFLOAT3(0.f, -1.f, 0.f);
 
-	v[3].Pos = XMVectorSet(0.f, 100.f, 0.1f, 1.f);
+	v[3].Pos = XMVectorSet(0.f, 0.5f, 1.f, 1.f);
 	v[3].Tex = XMFLOAT2(0.f, 1.f);
 	//v[3].Norm = XMFLOAT3(0.f, -1.f, 0.f);
 
@@ -151,19 +151,20 @@ int WINAPI WinMain(HINSTANCE hInstance,
 	{
 		Input::Get()->Update();
 
-		//camera.SetModelMatrix(XMMatrixTranslation(500.f * Input::Get()->GetAxis(Input::JOY0_LX), -500.f * Input::Get()->GetAxis(Input::JOY0_LY), 1000.f * Input::Get()->GetAxis(Input::JOY0_RY)));
+		camera.SetModelMatrix(XMMatrixTranslation(10.f*Input::Get()->GetAxis(Input::JOY0_LX), 10.f * Input::Get()->GetAxis(Input::JOY0_LY), 10.f*Input::Get()->GetAxis(Input::JOY0_RY)));
 		//camera.SetModelMatrix()
-		//renderer.ClearRenderTargets(&backBuffer, 1);
+		renderer.ClearRenderTargets(&backBuffer, 1);
 		//renderer.AttachMaterial(&mat);
 		//renderer.DrawIndexed(cube, 8, sizeof(D3D11VertexPosNormTex), indices, 36);
 		//renderer.PushContext();
 		//renderer.LoadMatrix(NewIdentity());
-		renderer.DrawIndexed(v, 4, sizeof(Vertex), indices, 6);
+		////renderer.MulMatrix(XMMatrixTranslation(10.f*Input::Get()->GetAxis(Input::JOY0_LX), 10.f * Input::Get()->GetAxis(Input::JOY0_LY), 10.f*Input::Get()->GetAxis(Input::JOY0_RY)));
+		//renderer.DrawIndexed(v, 4, sizeof(Vertex), indices, 6);
 		//renderer.PopContext();
 
-		//renderer.PushContext();
-		//DrawMeshes(&renderer, &mesh);
-		//renderer.PopContext();
+		renderer.PushContext();
+		DrawMeshes(&renderer, &mesh);
+		renderer.PopContext();
 
 		renderer.Flush();
 		++i;
