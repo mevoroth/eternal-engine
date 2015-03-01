@@ -151,7 +151,7 @@ int WINAPI WinMain(HINSTANCE hInstance,
 	{
 		Input::Get()->Update();
 
-		camera.SetModelMatrix(XMMatrixTranslation(10.f*Input::Get()->GetAxis(Input::JOY0_LX), 10.f * Input::Get()->GetAxis(Input::JOY0_LY), 10.f*Input::Get()->GetAxis(Input::JOY0_RY)));
+		camera.SetModelMatrix(XMMatrixTranslation(1000.f*Input::Get()->GetAxis(Input::JOY0_LX), 1000.f * Input::Get()->GetAxis(Input::JOY0_LY), 1000.f*Input::Get()->GetAxis(Input::JOY0_RY)));
 		//camera.SetModelMatrix()
 		renderer.ClearRenderTargets(&backBuffer, 1);
 		//renderer.AttachMaterial(&mat);
