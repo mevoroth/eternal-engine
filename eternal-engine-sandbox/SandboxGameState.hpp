@@ -2,6 +2,7 @@
 #define _SANDBOX_GAMESTATE_HPP_
 
 #include "Core/GameState.hpp"
+#include "Core/GameObject.hpp"
 
 namespace Sandbox
 {
@@ -15,6 +16,9 @@ namespace Sandbox
 			virtual void Update() override;
 			virtual GameState* NextState() override;
 			virtual void End() override;
+
+		private:
+			GameObject** _Objects;
 		};
 	}
 }
