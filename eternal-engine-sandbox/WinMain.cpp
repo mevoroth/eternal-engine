@@ -11,6 +11,7 @@
 #include "d3d11/D3D11PixelShader.hpp"
 #include "d3d11/D3D11BlendState.hpp"
 #include "d3d11/D3D11Viewport.hpp"
+#include "d3d11/D3D11RenderTarget.hpp"
 
 //#include "d3d10/D3D10Device.hpp"
 //#include "d3d10/D3D10Renderer.hpp"
@@ -147,13 +148,32 @@ int WINAPI WinMain(HINSTANCE hInstance,
 
 	float i = 0;
 
+	RenderTarget* DeferredRenderTargets[6] = {
+		new D3D11RenderTarget(Device::WIDTH, Device::HEIGHT),
+		new D3D11RenderTarget(Device::WIDTH, Device::HEIGHT),
+		new D3D11RenderTarget(Device::WIDTH, Device::HEIGHT),
+		new D3D11RenderTarget(Device::WIDTH, Device::HEIGHT),
+		new D3D11RenderTarget(Device::WIDTH, Device::HEIGHT),
+		new D3D11RenderTarget(Device::WIDTH, Device::HEIGHT)
+	};
+
 	while (true)
 	{
 		Input::Get()->Update();
 
 		camera.SetModelMatrix(XMMatrixTranslation(1000.f*Input::Get()->GetAxis(Input::JOY0_LX), 1000.f * Input::Get()->GetAxis(Input::JOY0_LY), 1000.f*Input::Get()->GetAxis(Input::JOY0_RY)));
+
+		renderer.AttachRenderTargets(DeferredRenderTargets, 6);
+		renderer.BeginDeferred();
+
+		renderer.PushContext();
+		DrawMeshes(&renderer, &mesh);
+		renderer.PopContext();
+
+		renderer.EndDeferred();
+
 		//camera.SetModelMatrix()
-		renderer.ClearRenderTargets(&backBuffer, 1);
+		//renderer.ClearRenderTargets(&backBuffer, 1);
 		//renderer.AttachMaterial(&mat);
 		//renderer.DrawIndexed(cube, 8, sizeof(D3D11VertexPosNormTex), indices, 36);
 		//renderer.PushContext();
@@ -162,11 +182,11 @@ int WINAPI WinMain(HINSTANCE hInstance,
 		//renderer.DrawIndexed(v, 4, sizeof(Vertex), indices, 6);
 		//renderer.PopContext();
 
-		renderer.PushContext();
-		DrawMeshes(&renderer, &mesh);
-		renderer.PopContext();
+		//renderer.PushContext();
+		//DrawMeshes(&renderer, &mesh);
+		//renderer.PopContext();
 
-		renderer.Flush();
+		//renderer.Flush();
 		++i;
 	}
 
@@ -178,7 +198,7 @@ void DrawMeshes(Renderer* renderer, const Mesh* mesh)
 	renderer->MulMatrix(mesh->GetTransform().GetModelMatrix());
 	if (mesh->GetVerticesCount() > 0)
 	{
-		renderer->DrawIndexed(mesh->GetVertices(), mesh->GetVerticesCount(), sizeof(Vertex), mesh->GetIndices(), mesh->GetIndicesCount());
+		static_cast<D3D11Renderer*>(renderer)->DrawDeferred(mesh->GetVertices(), mesh->GetVerticesCount(), sizeof(Vertex), mesh->GetIndices(), mesh->GetIndicesCount());
 	}
 
 	for (int i = 0, c = mesh->GetSubMeshesCount(); i < c; ++i)
