@@ -40,7 +40,7 @@ using namespace Eternal::Graphics;
 using namespace Eternal::Import;
 using namespace Eternal::Input;
 
-void DrawMeshes(Renderer* renderer, const Mesh* mesh);
+void DrawMeshes(D3D11Renderer* renderer, const Mesh* mesh);
 
 int WINAPI WinMain(HINSTANCE hInstance,
 	HINSTANCE hPrevInstance,
@@ -79,7 +79,7 @@ int WINAPI WinMain(HINSTANCE hInstance,
 	renderer.AttachCamera(&camera);
 	renderer.AttachRenderTargets(&backBuffer, 1);
 	renderer.SetBlendMode(&blendState);
-	D3D11Material mat;
+	D3D11Material Mat;
 	//D3D10Material mat;
 	D3D11InputLayout inputLayout((D3D11InputLayout::VertexDataType)(D3D11InputLayout::POSITION_T /*| D3D11InputLayout::NORMAL_T*/ | D3D11InputLayout::TEXCOORD_T));
 	//D3D10InputLayout inputLayout((D3D10InputLayout::VertexDataType)(D3D10InputLayout::POSITION_T /*| D3D11InputLayout::NORMAL_T*/ | D3D10InputLayout::TEXCOORD_T));
@@ -89,31 +89,31 @@ int WINAPI WinMain(HINSTANCE hInstance,
 	//D3D10VertexShader vs("default", "default.vs.hlsl", inputLayout);
 	//D3D10GeometryShader gs("default", "default.gs.hlsl");
 	//D3D10PixelShader ps("default", "default.ps.hlsl");
-	mat.AttachInputLayout(&inputLayout);
-	mat.AttachVertexShader(&vs);
-	mat.AttachGeometryShader(&gs);
-	mat.AttachPixelShader(&ps);
-	mat.Apply();
+	Mat.AttachInputLayout(&inputLayout);
+	Mat.AttachVertexShader(&vs);
+	Mat.AttachGeometryShader(&gs);
+	Mat.AttachPixelShader(&ps);
+	Mat.Apply();
 
 	D3D11Viewport viewport(0, 0, Device::WIDTH, Device::HEIGHT);
 	//D3D10Viewport viewport(0, 0, Device::WIDTH, Device::HEIGHT);
 	renderer.SetViewport(&viewport);
 	Vertex v[4];
 
-	v[0].Pos = XMVectorSet(0.f, 0.f, 1.f, 1.f);
-	v[0].Tex = XMFLOAT2(0.f, 0.f);
+	v[0].Pos = Vector4(0.f, 0.f, 1.f, 1.f);
+	v[0].Tex = Vector2(0.f, 0.f);
 	//v[0].Norm = XMFLOAT3(0.f, -1.f, 0.f);
 
-	v[1].Pos = XMVectorSet(0.5f, 0.f, 1.f, 1.f);
-	v[1].Tex = XMFLOAT2(1.f, 0.f);
+	v[1].Pos = Vector4(0.f, 1.f, 1.f, 1.f);
+	v[1].Tex = Vector2(1.f, 0.f);
 	//v[1].Norm = XMFLOAT3(0.f, -1.f, 0.f);
 
-	v[2].Pos = XMVectorSet(0.5f, 0.5f, 1.f, 1.f);
-	v[2].Tex = XMFLOAT2(1.f, 1.f);
+	v[2].Pos = Vector4(1.f, 1.f, 1.f, 1.f);
+	v[2].Tex = Vector2(1.f, 1.f);
 	//v[2].Norm = XMFLOAT3(0.f, -1.f, 0.f);
 
-	v[3].Pos = XMVectorSet(0.f, 0.5f, 1.f, 1.f);
-	v[3].Tex = XMFLOAT2(0.f, 1.f);
+	v[3].Pos = Vector4(1.f, 0.f, 1.f, 1.f);
+	v[3].Tex = Vector2(0.f, 1.f);
 	//v[3].Norm = XMFLOAT3(0.f, -1.f, 0.f);
 
 	uint16_t indices[6] = {
@@ -156,25 +156,34 @@ int WINAPI WinMain(HINSTANCE hInstance,
 		new D3D11RenderTarget(Device::WIDTH, Device::HEIGHT),
 		new D3D11RenderTarget(Device::WIDTH, Device::HEIGHT)
 	};
+	char truc[256];
+	sprintf_s(truc, "%x\n", &D3D11Renderer::DrawDeferred);
+
+	OutputDebugString(truc);
 
 	while (true)
 	{
 		Input::Get()->Update();
-
-		camera.SetModelMatrix(XMMatrixTranslation(1000.f*Input::Get()->GetAxis(Input::JOY0_LX), 1000.f * Input::Get()->GetAxis(Input::JOY0_LY), 1000.f*Input::Get()->GetAxis(Input::JOY0_RY)));
+		XMMATRIX TempMatrix = XMMatrixTranslation(1000.f*Input::Get()->GetAxis(Input::JOY0_LX), 1000.f * Input::Get()->GetAxis(Input::JOY0_LY), 1000.f*Input::Get()->GetAxis(Input::JOY0_RY));
+		Matrix4x4 ModelMatrix;
+		XMStoreFloat4x4(&ModelMatrix, TempMatrix);
+		camera.SetModelMatrix(ModelMatrix);
+		//camera.SetModelMatrix(XMMatrixTranslation(10.f*Input::Get()->GetAxis(Input::JOY0_LX), 10.f * Input::Get()->GetAxis(Input::JOY0_LY), 10.f*Input::Get()->GetAxis(Input::JOY0_RY)));
 
 		renderer.AttachRenderTargets(DeferredRenderTargets, 6);
 		renderer.BeginDeferred();
 
-		renderer.PushContext();
-		DrawMeshes(&renderer, &mesh);
-		renderer.PopContext();
+		renderer.AttachMaterial(&Mat);
+		//renderer.PushContext();
+		//DrawMeshes(&renderer, &mesh);
+		renderer.DrawDeferred(mesh.GetSubMeshes()[0].GetVertices(), mesh.GetSubMeshes()[0].GetVerticesCount(), sizeof(Vertex), mesh.GetSubMeshes()[0].GetIndices(), mesh.GetSubMeshes()[0].GetIndicesCount());
+		//renderer.PopContext();
 
 		renderer.EndDeferred();
 
 		//camera.SetModelMatrix()
 		//renderer.ClearRenderTargets(&backBuffer, 1);
-		//renderer.AttachMaterial(&mat);
+		//renderer.AttachRenderTargets(&backBuffer, 1);
 		//renderer.DrawIndexed(cube, 8, sizeof(D3D11VertexPosNormTex), indices, 36);
 		//renderer.PushContext();
 		//renderer.LoadMatrix(NewIdentity());
@@ -193,12 +202,12 @@ int WINAPI WinMain(HINSTANCE hInstance,
 	return 0;
 }
 
-void DrawMeshes(Renderer* renderer, const Mesh* mesh)
+void DrawMeshes(D3D11Renderer* renderer, const Mesh* mesh)
 {
 	renderer->MulMatrix(mesh->GetTransform().GetModelMatrix());
 	if (mesh->GetVerticesCount() > 0)
 	{
-		static_cast<D3D11Renderer*>(renderer)->DrawDeferred(mesh->GetVertices(), mesh->GetVerticesCount(), sizeof(Vertex), mesh->GetIndices(), mesh->GetIndicesCount());
+		renderer->DrawDeferred(mesh->GetVertices(), mesh->GetVerticesCount(), sizeof(Vertex), mesh->GetIndices(), mesh->GetIndicesCount());
 	}
 
 	for (int i = 0, c = mesh->GetSubMeshesCount(); i < c; ++i)
