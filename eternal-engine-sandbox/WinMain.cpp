@@ -105,7 +105,7 @@ int WINAPI WinMain(HINSTANCE hInstance,
 	//v[0].Norm = XMFLOAT3(0.f, -1.f, 0.f);
 
 	v[1].Pos = Vector4(0.f, 1.f, 1.f, 1.f);
-	v[1].Tex = Vector2(1.f, 0.f);
+	v[1].Tex = Vector2(0.f, 1.f);
 	//v[1].Norm = XMFLOAT3(0.f, -1.f, 0.f);
 
 	v[2].Pos = Vector4(1.f, 1.f, 1.f, 1.f);
@@ -113,7 +113,7 @@ int WINAPI WinMain(HINSTANCE hInstance,
 	//v[2].Norm = XMFLOAT3(0.f, -1.f, 0.f);
 
 	v[3].Pos = Vector4(1.f, 0.f, 1.f, 1.f);
-	v[3].Tex = Vector2(0.f, 1.f);
+	v[3].Tex = Vector2(1.f, 0.f);
 	//v[3].Norm = XMFLOAT3(0.f, -1.f, 0.f);
 
 	uint16_t indices[6] = {
@@ -164,7 +164,7 @@ int WINAPI WinMain(HINSTANCE hInstance,
 	while (true)
 	{
 		Input::Get()->Update();
-		XMMATRIX TempMatrix = XMMatrixTranslation(1000.f*Input::Get()->GetAxis(Input::JOY0_LX), 1000.f * Input::Get()->GetAxis(Input::JOY0_LY), 1000.f*Input::Get()->GetAxis(Input::JOY0_RY));
+		XMMATRIX TempMatrix = XMMatrixTranslation(1000.f*Input::Get()->GetAxis(Input::JOY0_LX), 1000.f * Input::Get()->GetAxis(Input::JOY0_LY), 10000.f*Input::Get()->GetAxis(Input::JOY0_RY));
 		Matrix4x4 ModelMatrix;
 		XMStoreFloat4x4(&ModelMatrix, TempMatrix);
 		camera.SetModelMatrix(ModelMatrix);
@@ -174,10 +174,11 @@ int WINAPI WinMain(HINSTANCE hInstance,
 		renderer.BeginDeferred();
 
 		renderer.AttachMaterial(&Mat);
-		//renderer.PushContext();
-		//DrawMeshes(&renderer, &mesh);
-		renderer.DrawDeferred(mesh.GetSubMeshes()[0].GetVertices(), mesh.GetSubMeshes()[0].GetVerticesCount(), sizeof(Vertex), mesh.GetSubMeshes()[0].GetIndices(), mesh.GetSubMeshes()[0].GetIndicesCount());
-		//renderer.PopContext();
+		renderer.PushContext();
+		renderer.AttachCamera(&camera);
+		DrawMeshes(&renderer, &mesh);
+		//renderer.DrawDeferred(mesh.GetSubMeshes()[0].GetVertices(), mesh.GetSubMeshes()[0].GetVerticesCount(), sizeof(Vertex), mesh.GetSubMeshes()[0].GetIndices(), mesh.GetSubMeshes()[0].GetIndicesCount());
+		renderer.PopContext();
 
 		renderer.EndDeferred();
 

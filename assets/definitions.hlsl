@@ -1,0 +1,6 @@
+#ifndef _DEFINITIONS_HLSL_
+#define _DEFINITIONS_HLSL_
+
+#define PI 3.14159265358979323846f
+
+#endif

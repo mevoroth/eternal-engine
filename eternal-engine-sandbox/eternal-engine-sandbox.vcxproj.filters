@@ -44,4 +44,15 @@
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="..\assets\lighting.hlsl">
+      <Filter>Fichiers de ressources</Filter>
+    </None>
+    <None Include="..\assets\definitions.hlsl">
+      <Filter>Fichiers de ressources</Filter>
+    </None>
+    <None Include="..\assets\functions.hlsl">
+      <Filter>Fichiers de ressources</Filter>
+    </None>
+  </ItemGroup>
 </Project>

@@ -1,33 +1,36 @@
-struct PIn
+#include "lighting.hlsl"
+
+struct PSIn
 {
 	float4 pos : SV_Position;
 	/*float4 norm : NORMAL;*/
-	float2 tex : TEXCOORD0;
+	float2 UV : TEXCOORD0;
 };
 
 Texture2D DiffuseTexture : register(t0);
 Texture2D MetallicSpecularRoughnessTexture : register(t1);
 Texture2D EmissiveTexture : register(t2);
 Texture2D NormalTexture : register(t3);
-Texture2D WorldPosTexture : register(t4);
-Texture2D AmbiantOcclusionTexture : register(t5);
-SamplerState Sampler;
-
-float4 PS( PIn input ) : SV_TARGET
+Texture2D WorldPositionTexture : register(t4);
+Texture2D AmbientOcclusionTexture : register(t5);
+SamplerState Sampler
 {
-	//float dotprod = input.norm.y/length(input.norm);
-	//if (dotprod < 0.f)
-	//{
-	//	dotprod = 0.f;
-	//}
-	//float4 color = txDiffuse.Sample( samLinear, input.tex );
-	//
-	//float Ia = 0.4f;
-	//float Id = 0.6f*max(0.f, dotprod);
-	//float Is = 0.9f*pow(max(0.f, dotprod), 1.f);
+	Filter = MIN_MAG_MIP_LINEAR;
+	AddressU = Wrap;
+	AddressV = Wrap;
+};
 
-	//color = color*Ia + color*Id + color*Is;
-	//color.w = 1.f;
+float4 PS( PSIn IN ) : SV_TARGET
+{
+	//float4 sampled = WorldPositionTexture.Sample(Sampler, IN.UV);
+	//return sampled / sampled.w;
 
-	return float4(1.0f, 1.0f, 1.0f, 1.0f);
+	GfxBuffer GfxBufferData;
+	GfxBufferData.Diffuse = DiffuseTexture.Sample(Sampler, IN.UV).xyz;
+	GfxBufferData.MetallicSpecularRoughness = MetallicSpecularRoughnessTexture.Sample(Sampler, IN.UV).xyz;
+	GfxBufferData.Emissive = EmissiveTexture.Sample(Sampler, IN.UV).xyz;
+	GfxBufferData.Normal = NormalTexture.Sample(Sampler, IN.UV).xyz;
+	GfxBufferData.AmbientOcclusion = AmbientOcclusionTexture.Sample(Sampler, IN.UV).xyz;
+
+	return float4(ComputeShading(GfxBufferData, 0, 0), 1);
 }

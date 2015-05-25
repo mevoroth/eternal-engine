@@ -1,4 +1,4 @@
-struct VIn
+struct VSIn
 {
 	float4 pos : SV_Position;
 	/*float4 norm : NORMAL;*/
@@ -6,29 +6,33 @@ struct VIn
 	/*float4 color : COLOR;*/
 };
 
-struct VOut
+struct VSOut
 {
 	float4 pos : SV_Position;
 	/*float4 norm : NORMAL;*/
 	float2 tex : TEXCOORD0;
+	float4 worldpos : TEXCOORD1;
 };
 
-cbuffer MatrixBuffer
+cbuffer MatrixBuffer : register(c0)
 {
 	matrix Model;
 	matrix View;
 	matrix Projection;
 };
 
-VOut VS( VIn input )
+VSOut VS( VSIn IN )
 {
-	VOut output = (VOut)0;
-	output.pos = input.pos;
-	//output.pos = mul( output.pos, WVPMat );
-	output.pos = mul(output.pos, Model);
-	output.pos = mul(output.pos, View);
-	output.pos = mul(output.pos, Projection);
-	//output.norm = input.norm;
-	output.tex = input.tex;
-	return output;
+	VSOut OUT = (VSOut)0;
+	OUT.pos = IN.pos;
+
+	OUT.pos = mul(OUT.pos, Model);
+	OUT.pos = mul(OUT.pos, View);
+	OUT.pos = mul(OUT.pos, Projection);
+
+	OUT.tex = IN.tex;
+
+	OUT.worldpos = OUT.pos;
+
+	return OUT;
 }
