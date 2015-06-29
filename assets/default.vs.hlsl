@@ -14,7 +14,18 @@ struct VSOut
 	float4 worldpos : TEXCOORD1;
 };
 
-cbuffer MatrixBuffer : register(c0)
+struct LightBuffer
+{
+	float3 Position;
+	float Distance;
+};
+
+cbuffer LightsBuffer : register(c0)
+{
+	LightBuffer Lights[8];
+};
+
+cbuffer MatrixBuffer : register(c1)
 {
 	matrix Model;
 	matrix View;
