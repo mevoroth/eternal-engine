@@ -28,7 +28,7 @@
 //#include "opengl/OGLDevice.hpp"
 //#include "opengl/OGLRenderer.hpp"
 
-#include "Mesh/Mesh.hpp"
+#include "Mesh/GenericMesh.hpp"
 #include "Import/fbx/ImportFbx.hpp"
 
 #include "Input/Win/WinInput.hpp"
@@ -39,10 +39,13 @@
 #include "d3d11/D3D11ShaderFactory.hpp"
 #include "Parallel/TaskManager.hpp"
 #include "RenderingTask.hpp"
+#include "Camera/PerspectiveCamera.hpp"
+#include "Light/Light.hpp"
 
 using namespace Eternal::Graphics;
 using namespace Eternal::Import;
 using namespace Eternal::Input;
+using namespace Eternal::Components;
 
 //void DrawMeshes(D3D11Renderer* renderer, const Mesh* mesh);
 
@@ -63,10 +66,22 @@ int WINAPI WinMain(HINSTANCE hInstance,
 	//new Eternal::Input::WinInput();
 
 	new ImportFbx();
-	Mesh<D3D11PosUVVertexBuffer::PosUVVertex, D3D11PosUVVertexBuffer, D3D11UInt32IndexBuffer> MeshObj;
-	ImportFbx::Get()->Import("mesh2.test.fbx", MeshObj);
+	GenericMesh<D3D11PosUVVertexBuffer::PosUVVertex, D3D11PosUVVertexBuffer, D3D11UInt32IndexBuffer> MeshObj;
+	ImportFbx::Get()->Import("mesh.test.fbx", MeshObj);
 
-	for (;;){}
+	PerspectiveCamera CameraObj(0.001f, 1000.f, 45.f);
+
+	std::vector<Light> Lights;
+	Lights.push_back(Light(NewVector3(0.f, 0.f, 0.f), 10000.f));
+
+	Eternal::Sandbox::RenderingTask Rendering(RendererObj, *RendererObj.GetMainContext(), &CameraObj, Lights);
+	Rendering.SetMesh(&MeshObj);
+	Rendering.SetRenderTarget(RendererObj.GetBackBuffer());
+	TaskManagerObj.Push(&Rendering);
+
+	for (;;)
+	{
+	}
 	////printf("test");
 
 
