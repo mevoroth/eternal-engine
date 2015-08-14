@@ -23,12 +23,14 @@ cbuffer MatrixBuffer
 VSOut VS( VSIn IN )
 {
 	VSOut OUT = (VSOut)0;
+	
 	OUT.pos = IN.pos;
-	//output.pos = mul( output.pos, WVPMat );
 	OUT.pos = mul(OUT.pos, Model);
 	OUT.pos = mul(OUT.pos, View);
 	OUT.pos = mul(OUT.pos, Projection);
+
 	//output.norm = input.norm;
 	OUT.tex = IN.tex;
+	
 	return OUT;
 }

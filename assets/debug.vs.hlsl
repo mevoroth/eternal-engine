@@ -1,9 +1,7 @@
 struct VSIn
 {
 	float4 pos : SV_Position;
-	/*float4 norm : NORMAL;*/
 	float2 tex : TEXCOORD0;
-	/*float4 color : COLOR;*/
 };
 
 struct VSOut
@@ -20,12 +18,12 @@ struct LightBuffer
 	float Distance;
 };
 
-cbuffer LightsBuffer : register(b0)
+cbuffer LightsBuffer : register(c0)
 {
 	LightBuffer Lights[8];
 };
 
-cbuffer ProjectionMatrix : register(b1)
+cbuffer MatrixBuffer : register(c1)
 {
 	//matrix Model;
 	//matrix View;
@@ -39,7 +37,7 @@ VSOut VS( VSIn IN )
 
 	//OUT.pos = mul(OUT.pos, Model);
 	//OUT.pos = mul(OUT.pos, View);
-	OUT.pos = mul(OUT.pos, Projection);
+	//OUT.pos = mul(OUT.pos, Projection);
 
 	OUT.tex = IN.tex;
 

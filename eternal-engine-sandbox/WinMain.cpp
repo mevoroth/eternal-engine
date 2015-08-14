@@ -12,6 +12,7 @@
 #include "d3d11/D3D11BlendState.hpp"
 #include "d3d11/D3D11Viewport.hpp"
 #include "d3d11/D3D11RenderTarget.hpp"
+#include "d3d11/D3D11Constant.hpp"
 
 //#include "d3d10/D3D10Device.hpp"
 //#include "d3d10/D3D10Renderer.hpp"
@@ -63,25 +64,60 @@ int WINAPI WinMain(HINSTANCE hInstance,
 
 	D3D11ShaderFactory ShaderFactoryObj;
 	
-	//new Eternal::Input::WinInput();
+	new Eternal::Input::WinInput();
 
 	new ImportFbx();
 	GenericMesh<D3D11PosUVVertexBuffer::PosUVVertex, D3D11PosUVVertexBuffer, D3D11UInt32IndexBuffer> MeshObj;
 	ImportFbx::Get()->Import("mesh.test.fbx", MeshObj);
 
+	GenericMesh<D3D11PosUVVertexBuffer::PosUVVertex, D3D11PosUVVertexBuffer, D3D11UInt32IndexBuffer> Plane;
+	D3D11PosUVVertexBuffer::PosUVVertex PlaneVertices[] = {
+		{ Vector4(0.f, 0.f, 1.f, 1.f), Vector2(0.f, 0.f) },
+		{ Vector4(0.f, 1.f, 1.f, 1.f), Vector2(0.f, 1.f) },
+		{ Vector4(1.f, 1.f, 1.f, 1.f), Vector2(1.f, 1.f) },
+		{ Vector4(1.f, 0.f, 1.f, 1.f), Vector2(1.f, 0.f) }
+	};
+	for (uint32_t VertexIndex = 0; VertexIndex < ETERNAL_ARRAYSIZE(PlaneVertices); ++VertexIndex)
+	{
+		Plane.PushVertex(PlaneVertices[VertexIndex]);
+	}
+	
+	uint32_t PlaneIndices[][3] = {
+		{ 0, 1, 2 },
+		{ 0, 2, 3 }
+	};
+	for (uint32_t IndexIndex = 0; IndexIndex < ETERNAL_ARRAYSIZE(PlaneIndices); ++IndexIndex)
+	{
+		uint32_t* Triangle = &PlaneIndices[IndexIndex][0];
+		Plane.PushTriangle(Triangle[0], Triangle[1], Triangle[2]);
+	}
+
 	PerspectiveCamera CameraObj(0.001f, 1000.f, 45.f);
 
 	std::vector<Light> Lights;
-	Lights.push_back(Light(NewVector3(0.f, 0.f, 0.f), 10000.f));
+	Lights.push_back(Light(Vector3(0.f, 0.f, 0.f), 10000.f));
 
-	Eternal::Sandbox::RenderingTask Rendering(RendererObj, *RendererObj.GetMainContext(), &CameraObj, Lights);
-	Rendering.SetMesh(&MeshObj);
-	Rendering.SetRenderTarget(RendererObj.GetBackBuffer());
-	TaskManagerObj.Push(&Rendering);
+	D3D11RenderTarget* RenderTargets[] = {
+		new D3D11RenderTarget(640, 480),
+		new D3D11RenderTarget(640, 480),
+		new D3D11RenderTarget(640, 480),
+		new D3D11RenderTarget(640, 480),
+		new D3D11RenderTarget(640, 480),
+		new D3D11RenderTarget(640, 480)
+	};
 
 	for (;;)
 	{
+		Input::Get()->Update();
+		Eternal::Sandbox::RenderingTask* Rendering = new Eternal::Sandbox::RenderingTask(RendererObj, *RendererObj.GetMainContext(), &CameraObj, Lights);
+		//Rendering->SetMesh(&Plane);
+		Rendering->SetMesh(&MeshObj);
+		Rendering->SetRenderTargets((RenderTarget**)&RenderTargets, ETERNAL_ARRAYSIZE(RenderTargets));
+		TaskManagerObj.Push(Rendering);
+		while (!Rendering->IsFinished());
+		//delete Rendering;
 	}
+	
 	////printf("test");
 
 

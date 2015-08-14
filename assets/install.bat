@@ -1,5 +1,8 @@
 cd ..\Debug
 
+mklink debug.ps.hlsl ..\assets\debug.ps.hlsl
+mklink debug.vs.hlsl ..\assets\debug.vs.hlsl
+mklink debug.gs.hlsl ..\assets\debug.gs.hlsl
 mklink default.ps.hlsl ..\assets\default.ps.hlsl
 mklink default.vs.hlsl ..\assets\default.vs.hlsl
 mklink default.gs.hlsl ..\assets\default.gs.hlsl
@@ -13,6 +16,9 @@ mklink mesh.test.fbx ..\assets\mesh.test.fbx
 
 cd ..\x64\Debug
 
+mklink debug.ps.hlsl ..\..\assets\debug.ps.hlsl
+mklink debug.vs.hlsl ..\..\assets\debug.vs.hlsl
+mklink debug.gs.hlsl ..\..\assets\debug.gs.hlsl
 mklink default.ps.hlsl ..\..\assets\default.ps.hlsl
 mklink default.vs.hlsl ..\..\assets\default.vs.hlsl
 mklink default.gs.hlsl ..\..\assets\default.gs.hlsl
