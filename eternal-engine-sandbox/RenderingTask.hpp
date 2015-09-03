@@ -43,6 +43,9 @@ namespace Eternal
 
 			void SetMesh(Components::Mesh* MeshObj);
 			void SetRenderTargets(_In_ Graphics::RenderTarget** RenderTargets, _In_ uint32_t Count);
+			void SetBackBufferRenderTarget(_In_ Graphics::RenderTarget* BackBuffer);
+			void SetDeferredQuad(_In_ Components::Mesh* DeferredQuad);
+			void SetViewMatrix(_In_ const Types::Matrix4x4& ViewMatrix);
 
 		private:
 			void _Draw(Components::Mesh* MeshObj);
@@ -52,7 +55,10 @@ namespace Eternal
 			Graphics::Shader* _VS = nullptr;
 			Graphics::Shader* _GS = nullptr;
 			Graphics::Shader* _PS = nullptr;
+			Graphics::Shader* _DeferredVS = nullptr;
+			Graphics::Shader* _DeferredPS = nullptr;
 			Graphics::RenderTarget** _RTs = nullptr;
+			Graphics::RenderTarget* _BackBuffer = nullptr;
 			uint32_t _RTCount = 0;
 			Graphics::BlendState* _BlendState = nullptr;
 			Graphics::Viewport* _Viewport = nullptr;
@@ -64,9 +70,12 @@ namespace Eternal
 			Components::Camera* _Camera = nullptr;
 			Components::Light* _Lights = nullptr;
 			Components::Mesh* _Mesh = nullptr;
+			Components::Mesh* _DeferredQuad = nullptr;
 
 			Container::Stack<Types::Matrix4x4, STACK_SIZE> _ModelContext;
 			Types::Matrix4x4 _ContextMatrix;
+
+			Types::Matrix4x4 _ViewMatrix;
 		};
 	}
 }

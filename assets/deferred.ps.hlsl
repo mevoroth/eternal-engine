@@ -13,24 +13,25 @@ Texture2D EmissiveTexture : register(t2);
 Texture2D NormalTexture : register(t3);
 Texture2D WorldPositionTexture : register(t4);
 Texture2D AmbientOcclusionTexture : register(t5);
-SamplerState Sampler
+SamplerState DefaultSampler
 {
 	Filter = MIN_MAG_MIP_LINEAR;
 	AddressU = Wrap;
 	AddressV = Wrap;
 };
 
-float4 PS( PSIn IN ) : SV_TARGET
+float4 PS( PSIn IN ) : SV_Target0
 {
 	//float4 sampled = WorldPositionTexture.Sample(Sampler, IN.UV);
 	//return sampled / sampled.w;
 
 	GfxBuffer GfxBufferData;
-	GfxBufferData.Diffuse = DiffuseTexture.Sample(Sampler, IN.UV).xyz;
-	GfxBufferData.MetallicSpecularRoughness = MetallicSpecularRoughnessTexture.Sample(Sampler, IN.UV).xyz;
-	GfxBufferData.Emissive = EmissiveTexture.Sample(Sampler, IN.UV).xyz;
-	GfxBufferData.Normal = NormalTexture.Sample(Sampler, IN.UV).xyz;
-	GfxBufferData.AmbientOcclusion = AmbientOcclusionTexture.Sample(Sampler, IN.UV).xyz;
+	GfxBufferData.Diffuse = DiffuseTexture.Sample(DefaultSampler, IN.UV).xyz;
+	GfxBufferData.MetallicSpecularRoughness = MetallicSpecularRoughnessTexture.Sample(DefaultSampler, IN.UV).xyz;
+	GfxBufferData.Emissive = EmissiveTexture.Sample(DefaultSampler, IN.UV).xyz;
+	GfxBufferData.Normal = NormalTexture.Sample(DefaultSampler, IN.UV).xyz;
+	GfxBufferData.AmbientOcclusion = AmbientOcclusionTexture.Sample(DefaultSampler, IN.UV).xyz;
 
+	return float4(GfxBufferData.Diffuse, 1);
 	return float4(ComputeShading(GfxBufferData, 0, 0), 1);
 }

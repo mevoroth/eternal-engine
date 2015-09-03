@@ -1,17 +1,17 @@
 struct GSIn
 {
-	float4 pos : SV_Position;
+	float4 Pos : SV_Position;
 	/*float4 norm : NORMAL;*/
-	float2 tex : TEXCOORD0;
-	float4 worldpos : TEXCOORD1;
+	float2 Tex : TEXCOORD0;
+	float4 Worldpos : TEXCOORD1;
 };
 
 struct GSOut
 {
-	float4 pos : SV_Position;
+	float4 Pos : SV_Position;
 	/*float4 norm : NORMAL;*/
 	float2 tex : TEXCOORD0;
-	float4 worldpos : TEXCOORD1;
+	float4 Worldpos : TEXCOORD1;
 };
 
 [maxvertexcount(3)]
