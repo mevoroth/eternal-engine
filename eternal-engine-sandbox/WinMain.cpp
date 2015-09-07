@@ -45,6 +45,7 @@
 #include "Light/Light.hpp"
 #include "Transform/Transform.hpp"
 #include "Types/Types.hpp"
+#include "d3d11/D3D11PosUVVertexBuffer.hpp"
 
 using namespace Eternal::Graphics;
 using namespace Eternal::Import;
@@ -71,8 +72,8 @@ int WINAPI WinMain(HINSTANCE hInstance,
 	new Eternal::Input::WinInput();
 
 	new ImportFbx();
-	GenericMesh<D3D11PosUVVertexBuffer::PosUVVertex, D3D11PosUVVertexBuffer, D3D11UInt32IndexBuffer> MeshObj;
-	ImportFbx::Get()->Import("mesh.test.fbx", MeshObj);
+	GenericMesh<D3D11PosUVNormalVertexBuffer::PosUVNormalVertex, D3D11PosUVNormalVertexBuffer, D3D11UInt32IndexBuffer> MeshObj;
+	ImportFbx::Get()->Import("sponza.fbx", MeshObj);
 
 	GenericMesh<D3D11PosUVVertexBuffer::PosUVVertex, D3D11PosUVVertexBuffer, D3D11UInt32IndexBuffer> Plane;
 	D3D11PosUVVertexBuffer::PosUVVertex PlaneVertices[] = {
@@ -96,7 +97,7 @@ int WINAPI WinMain(HINSTANCE hInstance,
 		Plane.PushTriangle(Triangle[0], Triangle[1], Triangle[2]);
 	}
 
-	PerspectiveCamera CameraObj(0.001f, 1000.f, 60.f);
+	PerspectiveCamera CameraObj(0.1f, 1000.f, 135.f);
 	OrthographicCamera OrthoCamObj(0.f, 1000.f, 1.f);
 
 	std::vector<Light> Lights;
@@ -119,8 +120,19 @@ int WINAPI WinMain(HINSTANCE hInstance,
 
 		Vector3 Forward = CameraTransform.GetForward();
 		Vector3 Right = CameraTransform.GetRight();
+		Vector3 Up = CameraTransform.GetUp();
 
-		CameraTransform.Translate(Input::Get()->GetAxis(Input::JOY0_LX) * 0.001f * Right + Input::Get()->GetAxis(Input::JOY0_LY) * 0.001f * Forward);
+		//CameraTransform.Translate(Input::Get()->GetAxis(Input::JOY0_LX) * 0.001f * Right - Input::Get()->GetAxis(Input::JOY0_LY) * 0.001f * Forward);
+		CameraTransform.Translate(Vector3(
+			0.f,
+			Input::Get()->GetAxis(Input::JOY0_LX) * 1.f,
+			Input::Get()->GetAxis(Input::JOY0_LY) * 1.f
+		));
+		CameraTransform.Rotate(Vector3(
+			Input::Get()->GetAxis(Input::JOY0_RY) * 0.05f,
+			Input::Get()->GetAxis(Input::JOY0_RX) * 0.05f,
+			0.f
+		));
 
 		Eternal::Sandbox::RenderingTask* Rendering = new Eternal::Sandbox::RenderingTask(RendererObj, *RendererObj.GetMainContext(), &CameraObj, Lights);
 		Rendering->SetViewMatrix(CameraTransform.GetModelMatrix());

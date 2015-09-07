@@ -1,3 +1,5 @@
+#include "default.constants.hlsl"
+
 struct VSIn
 {
 	float4 Pos : SV_Position;
@@ -14,33 +16,17 @@ struct VSOut
 	float4 worldpos : TEXCOORD1;
 };
 
-struct LightBuffer
-{
-	float3 Position;
-	float Distance;
-};
-
-cbuffer LightsBuffer : register(b0)
-{
-	LightBuffer Lights[8];
-};
-
-cbuffer ProjectionMatrix : register(b1)
-{
-	//matrix Model;
-	matrix Projection;
-	matrix View;
-};
-
 VSOut VS( VSIn IN )
 {
 	VSOut OUT = (VSOut)0;
 	OUT.Pos = IN.Pos;
+	OUT.Pos.w = 1.f;
 
 	//OUT.Pos = mul(OUT.Pos, Model);
 	//OUT.Pos = mul(OUT.Pos, View);
+	OUT.Pos = mul(OUT.Pos, transpose(Model));
+	OUT.Pos = mul(OUT.Pos, (View));
 	OUT.Pos = mul(OUT.Pos, Projection);
-	OUT.Pos = mul(OUT.Pos, transpose(View));
 
 	OUT.Tex = IN.Tex;
 

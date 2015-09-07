@@ -50,6 +50,9 @@
     <FxCompile Include="..\assets\debug.vs.hlsl">
       <Filter>Fichiers de ressources</Filter>
     </FxCompile>
+    <FxCompile Include="..\assets\default.constants.hlsl">
+      <Filter>Fichiers de ressources</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SandboxGameState.hpp">
