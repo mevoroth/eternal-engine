@@ -13,6 +13,7 @@
 #include "d3d11/D3D11Viewport.hpp"
 #include "Transform/Transform.hpp"
 #include "d3d11/D3D11RenderTarget.hpp"
+#include "d3d11/D3D11Sampler.hpp"
 
 using namespace Eternal;
 using namespace Eternal::Sandbox;
@@ -28,15 +29,20 @@ RenderingTask::RenderingTask(
 	, _Context(ContextObj)
 	, _Camera(CameraObj)
 {
-	Graphics::InputLayout::VertexDataType DataType[] = {
+	Graphics::InputLayout::VertexDataType MeshDataType[] = {
 		Graphics::InputLayout::POSITION_T,
+		Graphics::InputLayout::NORMAL_T,
 		Graphics::InputLayout::UV_T
 	};
-	_VS = Graphics::ShaderFactory::Get()->CreateVertexShader("Default", "default.vs.hlsl", DataType, ETERNAL_ARRAYSIZE(DataType));
+	_VS = Graphics::ShaderFactory::Get()->CreateVertexShader("Default", "default.vs.hlsl", MeshDataType, ETERNAL_ARRAYSIZE(MeshDataType));
 	_GS = Graphics::ShaderFactory::Get()->CreateGeometryShader("Default", "default.gs.hlsl");
 	_PS = Graphics::ShaderFactory::Get()->CreatePixelShader("Default", "default.ps.hlsl");
 
-	_DeferredVS = Graphics::ShaderFactory::Get()->CreateVertexShader("Deferred", "deferred.vs.hlsl", DataType, ETERNAL_ARRAYSIZE(DataType));
+	Graphics::InputLayout::VertexDataType PostProcessDataType[] = {
+		Graphics::InputLayout::POSITION_T,
+		Graphics::InputLayout::UV_T
+	};
+	_DeferredVS = Graphics::ShaderFactory::Get()->CreateVertexShader("Deferred", "deferred.vs.hlsl", PostProcessDataType, ETERNAL_ARRAYSIZE(PostProcessDataType));
 	_DeferredPS = Graphics::ShaderFactory::Get()->CreatePixelShader("Deferred", "deferred.ps.hlsl");
 
 	_LightsConstants = new Graphics::D3D11Constant(sizeof(Components::Light) * 8, Graphics::D3D11Resource::IMMUTABLE, Graphics::D3D11Resource::NONE, (void*)&Lights[0]);
@@ -44,8 +50,9 @@ RenderingTask::RenderingTask(
 	CameraObj->GetProjectionMatrix(CameraMatrix);
 	_CameraConstant = new Graphics::D3D11Constant(sizeof(Types::Matrix4x4) * 2, Graphics::D3D11Resource::DYNAMIC, Graphics::D3D11Resource::WRITE, (void*)&CameraMatrix);
 	_ModelConstant = new Graphics::D3D11Constant(sizeof(Types::Matrix4x4), Graphics::D3D11Resource::DYNAMIC, Graphics::D3D11Resource::WRITE, (void*)&_ContextMatrix);
-	_BlendState = new Graphics::D3D11BlendState(Graphics::BlendState::INV_DEST_ALPHA, Graphics::BlendState::DEST_ALPHA, Graphics::BlendState::OP_ADD,
-		Graphics::BlendState::INV_DEST_ALPHA, Graphics::BlendState::DEST_ALPHA, Graphics::BlendState::OP_ADD);
+	_StandardSampler = new Graphics::D3D11Sampler(true, true, true, false, Graphics::Sampler::WRAP, Graphics::Sampler::WRAP, Graphics::Sampler::WRAP);
+	_BlendState = new Graphics::D3D11BlendState(Graphics::BlendState::SRC_ALPHA, Graphics::BlendState::INV_SRC_ALPHA, Graphics::BlendState::OP_ADD,
+		Graphics::BlendState::SRC_ALPHA, Graphics::BlendState::INV_SRC_ALPHA, Graphics::BlendState::OP_ADD);
 	_Viewport = new Graphics::D3D11Viewport(0, 0, 640, 480);
 	_ContextMatrix = Types::NewIdentity();
 }
@@ -62,18 +69,15 @@ RenderingTask::~RenderingTask()
 	_BlendState = nullptr;
 	delete _Viewport;
 	_Viewport = nullptr;
-	delete _VS;
-	delete _GS;
-	delete _PS;
-	delete _DeferredVS;
-	delete _DeferredPS;
+	//delete _VS;
+	//delete _GS;
+	//delete _PS;
+	//delete _DeferredVS;
+	//delete _DeferredPS;
 }
 
 void RenderingTask::DoTask()
 {
-	static Graphics::D3D11BlendState BlendStateObj(Graphics::BlendState::ZERO, Graphics::BlendState::ONE, Graphics::BlendState::OP_MAX,
-		Graphics::BlendState::ZERO, Graphics::BlendState::ONE, Graphics::BlendState::OP_ADD);
-
 	Graphics::RenderTarget* RenderTargets[] = {
 		nullptr,
 		nullptr,
@@ -150,10 +154,14 @@ void RenderingTask::DoTask()
 	_Context.BindBuffer<Graphics::Context::PIXEL>(4, (Graphics::D3D11RenderTarget*)_RTs[4]);
 	_Context.BindBuffer<Graphics::Context::PIXEL>(5, (Graphics::D3D11RenderTarget*)_RTs[5]);
 
+	_Context.BindSampler<Graphics::Context::PIXEL>(0, _StandardSampler);
+
 	_Context.SetRenderTargets(&_BackBuffer, 1);
 
 	_Context.DrawIndexed(_DeferredQuad->GetVertexBuffer(), _DeferredQuad->GetIndexBuffer());
 	static_cast<Graphics::D3D11Renderer*>(Graphics::Renderer::Get())->Flush();
+
+	_Context.UnbindSampler<Graphics::Context::PIXEL>(0);
 
 	_Context.UnbindBuffer<Graphics::Context::PIXEL>(0);
 	_Context.UnbindBuffer<Graphics::Context::PIXEL>(1);

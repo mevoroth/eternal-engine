@@ -2,7 +2,7 @@
 
 struct PSIn
 {
-	float4 pos : SV_Position;
+	float4 Pos : SV_Position;
 	/*float4 norm : NORMAL;*/
 	float2 UV : TEXCOORD0;
 };
@@ -13,12 +13,7 @@ Texture2D EmissiveTexture : register(t2);
 Texture2D NormalTexture : register(t3);
 Texture2D WorldPositionTexture : register(t4);
 Texture2D AmbientOcclusionTexture : register(t5);
-SamplerState DefaultSampler
-{
-	Filter = MIN_MAG_MIP_LINEAR;
-	AddressU = Wrap;
-	AddressV = Wrap;
-};
+sampler DefaultSampler : register(s0);
 
 float4 PS( PSIn IN ) : SV_Target0
 {

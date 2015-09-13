@@ -73,7 +73,7 @@ int WINAPI WinMain(HINSTANCE hInstance,
 
 	new ImportFbx();
 	GenericMesh<D3D11PosUVNormalVertexBuffer::PosUVNormalVertex, D3D11PosUVNormalVertexBuffer, D3D11UInt32IndexBuffer> MeshObj;
-	ImportFbx::Get()->Import("sponza.fbx", MeshObj);
+	ImportFbx::Get()->Import("mesh.test.fbx", MeshObj);
 
 	GenericMesh<D3D11PosUVVertexBuffer::PosUVVertex, D3D11PosUVVertexBuffer, D3D11UInt32IndexBuffer> Plane;
 	D3D11PosUVVertexBuffer::PosUVVertex PlaneVertices[] = {
@@ -101,7 +101,8 @@ int WINAPI WinMain(HINSTANCE hInstance,
 	OrthographicCamera OrthoCamObj(0.f, 1000.f, 1.f);
 
 	std::vector<Light> Lights;
-	Lights.push_back(Light(Vector3(0.f, 0.f, 0.f), 10000.f));
+	Lights.push_back(Light(Vector3(0.f, 0.f, 0.f), 1.f));
+	Lights.push_back(Light(Vector3(0.f, 0.f, 0.f), 1.f));
 
 	D3D11RenderTarget* RenderTargets[] = {
 		new D3D11RenderTarget(640, 480),
@@ -122,14 +123,14 @@ int WINAPI WinMain(HINSTANCE hInstance,
 		Vector3 Right = CameraTransform.GetRight();
 		Vector3 Up = CameraTransform.GetUp();
 
-		//CameraTransform.Translate(Input::Get()->GetAxis(Input::JOY0_LX) * 0.001f * Right - Input::Get()->GetAxis(Input::JOY0_LY) * 0.001f * Forward);
+		//CameraTransform.Translate(Input::Get()->GetAxis(Input::JOY0_LX) * 1.f * Right - Input::Get()->GetAxis(Input::JOY0_LY) * 1.f * Forward);
 		CameraTransform.Translate(Vector3(
-			0.f,
 			Input::Get()->GetAxis(Input::JOY0_LX) * 1.f,
-			Input::Get()->GetAxis(Input::JOY0_LY) * 1.f
+			Input::Get()->GetAxis(Input::JOY0_RY) * 1.f,
+			-Input::Get()->GetAxis(Input::JOY0_LY) * 1.f
 		));
 		CameraTransform.Rotate(Vector3(
-			Input::Get()->GetAxis(Input::JOY0_RY) * 0.05f,
+			0.f,
 			Input::Get()->GetAxis(Input::JOY0_RX) * 0.05f,
 			0.f
 		));

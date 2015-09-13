@@ -18,6 +18,7 @@ namespace Eternal
 		class Constant;
 		class BlendState;
 		class Viewport;
+		class Sampler;
 	}
 	namespace Components
 	{
@@ -62,6 +63,8 @@ namespace Eternal
 			uint32_t _RTCount = 0;
 			Graphics::BlendState* _BlendState = nullptr;
 			Graphics::Viewport* _Viewport = nullptr;
+
+			Graphics::Sampler* _StandardSampler = nullptr;
 
 			Graphics::Constant* _LightsConstants = nullptr;
 			Graphics::Constant* _CameraConstant = nullptr;

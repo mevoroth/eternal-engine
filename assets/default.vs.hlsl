@@ -3,17 +3,16 @@
 struct VSIn
 {
 	float4 Pos : SV_Position;
-	/*float4 norm : NORMAL;*/
-	float2 Tex : TEXCOORD0;
-	/*float4 color : COLOR;*/
+	float4 Normal : NORMAL;
+	float2 UV : TEXCOORD0;
 };
 
 struct VSOut
 {
 	float4 Pos : SV_Position;
-	/*float4 norm : NORMAL;*/
-	float2 Tex : TEXCOORD0;
-	float4 worldpos : TEXCOORD1;
+	float4 Normal : NORMAL;
+	float2 UV : TEXCOORD0;
+	float4 WorldPos : TEXCOORD1;
 };
 
 VSOut VS( VSIn IN )
@@ -22,15 +21,13 @@ VSOut VS( VSIn IN )
 	OUT.Pos = IN.Pos;
 	OUT.Pos.w = 1.f;
 
-	//OUT.Pos = mul(OUT.Pos, Model);
-	//OUT.Pos = mul(OUT.Pos, View);
 	OUT.Pos = mul(OUT.Pos, transpose(Model));
 	OUT.Pos = mul(OUT.Pos, (View));
 	OUT.Pos = mul(OUT.Pos, Projection);
 
-	OUT.Tex = IN.Tex;
-
-	OUT.worldpos = OUT.Pos;
+	OUT.UV = IN.UV;
+	OUT.Normal = IN.Normal;
+	OUT.WorldPos = OUT.Pos;
 
 	return OUT;
 }

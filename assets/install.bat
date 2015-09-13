@@ -15,6 +15,7 @@ mklink functions.hlsl ..\assets\functions.hlsl
 mklink libfbxsdk.dll "C:\Program Files\Autodesk\FBX\FBX SDK\2015.1\lib\vs2013\x86\debug\libfbxsdk.dll"
 mklink mesh.test.fbx ..\assets\mesh.test.fbx
 mklink sponza.fbx ..\assets\sponza.fbx
+mklink sphere.fbx ..\assets\sphere.fbx
 
 cd ..\x64\Debug
 
@@ -33,5 +34,6 @@ mklink functions.hlsl ..\..\assets\functions.hlsl
 mklink libfbxsdk.dll "C:\Program Files\Autodesk\FBX\FBX SDK\2015.1\lib\vs2013\x64\debug\libfbxsdk.dll"
 mklink mesh.test.fbx ..\..\assets\mesh.test.fbx
 mklink sponza.fbx ..\..\assets\sponza.fbx
+mklink sphere.fbx ..\..\assets\sphere.fbx
 
 pause

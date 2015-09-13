@@ -3,9 +3,9 @@
 struct PSIn
 {
 	float4 Pos : SV_Position;
-	/*float4 norm : NORMAL;*/
-	float2 Tex : TEXCOORD0;
-	float4 Worldpos : TEXCOORD1;
+	float4 Normal : NORMAL;
+	float2 UV : TEXCOORD0;
+	float4 WorldPos : TEXCOORD1;
 };
 
 struct PSOut
@@ -18,21 +18,22 @@ struct PSOut
 	float4 AmbiantOcclusion				: SV_TARGET5;
 };
 
-float ComputeLight(in float4 L, in float3 Pos)
+float ComputeLight(in float3 Pos, in float4 L, in float3 Normal)
 {
-	return length(L.xyz - Pos) * length(L.xyz - Pos) / L.w;
+	float3 Light = normalize(L.xyz - Pos);
+
+	return dot(Normal, Light);// / Length;
 }
 
 PSOut PS( PSIn IN ) : SV_TARGET
 {
 	PSOut OUT = (PSOut)0;
 
-	OUT.Diffuse = float4(1.0f, 1.0f, 1.0f, 1.0f) * ComputeLight(float4(Lights[0].Position, Lights[0].Distance), IN.Worldpos.xyz);
+	OUT.Diffuse = float4(1.0f, 1.0f, 1.0f, 1.0f) * ComputeLight(IN.WorldPos.xyz, float4(Lights[0].Position, Lights[0].Distance), IN.Normal.xyz);
 	OUT.MetallicSpecularRoughness = float4(0.f, 0.f, 0.f, 0.f);
 	OUT.Emissive = float4(1.0f, 1.0f, 1.0f, 1.0f);
-	OUT.Normal = float4(0.5f, 0.5f, 0.5f, 1.f);
-	OUT.WorldPosition = IN.Worldpos;
-	OUT.WorldPosition.xyz = OUT.WorldPosition.xyz;
+	OUT.Normal = float4(IN.UV, 0, 0);
+	OUT.WorldPosition = IN.WorldPos;
 	OUT.AmbiantOcclusion = float4(0.5f, 0.f, 0.5f, 1.0f);
 
 	return OUT;
