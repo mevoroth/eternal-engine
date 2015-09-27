@@ -140,6 +140,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="FakeTask.cpp" />
     <ClCompile Include="RenderingTask.cpp" />
     <ClCompile Include="SandboxGameState.cpp" />
     <ClCompile Include="WinMain.cpp" />
@@ -224,6 +225,7 @@
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="FakeTask.hpp" />
     <ClInclude Include="RenderingTask.hpp" />
     <ClInclude Include="SandboxGameState.hpp" />
   </ItemGroup>

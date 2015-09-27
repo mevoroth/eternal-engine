@@ -22,7 +22,7 @@ float ComputeLight(in float3 Pos, in float4 L, in float3 Normal)
 {
 	float3 Light = normalize(L.xyz - Pos);
 
-	return dot(Normal, Light);// / Length;
+	return dot(-Normal, Light);// / Length;
 }
 
 PSOut PS( PSIn IN ) : SV_TARGET

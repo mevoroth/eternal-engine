@@ -14,6 +14,12 @@
 #include "Transform/Transform.hpp"
 #include "d3d11/D3D11RenderTarget.hpp"
 #include "d3d11/D3D11Sampler.hpp"
+#include "d3d11/D3D11DepthStencil.hpp"
+#include "d3d11/D3D11DepthStencilBuffer.hpp"
+#include "Graphics/DepthTest.hpp"
+#include "Graphics/StencilTest.hpp"
+
+#include "d3d11/D3D11Context.hpp"
 
 using namespace Eternal;
 using namespace Eternal::Sandbox;
@@ -44,7 +50,7 @@ RenderingTask::RenderingTask(
 	};
 	_DeferredVS = Graphics::ShaderFactory::Get()->CreateVertexShader("Deferred", "deferred.vs.hlsl", PostProcessDataType, ETERNAL_ARRAYSIZE(PostProcessDataType));
 	_DeferredPS = Graphics::ShaderFactory::Get()->CreatePixelShader("Deferred", "deferred.ps.hlsl");
-
+	
 	_LightsConstants = new Graphics::D3D11Constant(sizeof(Components::Light) * 8, Graphics::D3D11Resource::IMMUTABLE, Graphics::D3D11Resource::NONE, (void*)&Lights[0]);
 	Types::Matrix4x4 CameraMatrix;
 	CameraObj->GetProjectionMatrix(CameraMatrix);
@@ -54,11 +60,18 @@ RenderingTask::RenderingTask(
 	_BlendState = new Graphics::D3D11BlendState(Graphics::BlendState::SRC_ALPHA, Graphics::BlendState::INV_SRC_ALPHA, Graphics::BlendState::OP_ADD,
 		Graphics::BlendState::SRC_ALPHA, Graphics::BlendState::INV_SRC_ALPHA, Graphics::BlendState::OP_ADD);
 	_Viewport = new Graphics::D3D11Viewport(0, 0, 640, 480);
+	_DepthStencilState = new Graphics::D3D11DepthStencil(
+		Graphics::DepthTest(Graphics::DepthTest::ALL, Graphics::Comparison::LESS),
+		Graphics::StencilTest()
+	);
+	_DepthStencilBuffer = new Graphics::D3D11DepthStencilBuffer(640, 480);
 	_ContextMatrix = Types::NewIdentity();
+	OutputDebugString("BEGINNING RENDERING\n");
 }
 
 RenderingTask::~RenderingTask()
 {
+	OutputDebugString("ENDING RENDERING\n");
 	delete _LightsConstants;
 	_LightsConstants = nullptr;
 	delete _CameraConstant;
@@ -69,11 +82,12 @@ RenderingTask::~RenderingTask()
 	_BlendState = nullptr;
 	delete _Viewport;
 	_Viewport = nullptr;
-	//delete _VS;
-	//delete _GS;
-	//delete _PS;
-	//delete _DeferredVS;
-	//delete _DeferredPS;
+	delete _StandardSampler;
+	_StandardSampler = nullptr;
+	delete _DepthStencilState;
+	_DepthStencilState = nullptr;
+	delete _DepthStencilBuffer;
+	_DepthStencilBuffer = nullptr;
 }
 
 void RenderingTask::DoTask()
@@ -94,6 +108,7 @@ void RenderingTask::DoTask()
 	{
 		_RTs[RenderTargetIndex]->Clear(&_Context);
 	}
+	_DepthStencilBuffer->Clear(&_Context);
 
 	Graphics::Resource::LockedResource LockedResourceObj = ((Graphics::D3D11Constant*)_CameraConstant)->Lock(_Context, Graphics::Resource::LOCK_WRITE_DISCARD);
 	Matrix4x4* CameraMatrix = (Matrix4x4*)LockedResourceObj.Data;
@@ -117,9 +132,10 @@ void RenderingTask::DoTask()
 	_Context.SetBlendMode(_BlendState);
 	_Context.SetViewport(_Viewport);
 
+	static_cast<Graphics::D3D11Context&>(_Context).GetD3D11Context()->OMSetDepthStencilState(_DepthStencilState->GetD3D11DepthStencilState(), 0);
+	_Context.SetDepthBuffer(_DepthStencilBuffer);
 	_Context.SetRenderTargets(_RTs, _RTCount);
 
-	//_Context.DrawIndexed(_DeferredQuad->GetVertexBuffer(), _DeferredQuad->GetIndexBuffer());
 	_ModelContext.Push(_ContextMatrix);
 	//XMStoreFloat4x4(&_ContextMatrix, XMMatrixIdentity());
 	//_ContextMatrix.m[3][0] = _ViewMatrix.m[3][0];
@@ -132,6 +148,8 @@ void RenderingTask::DoTask()
 	_ModelContext.Pop();
 
 	_Context.SetRenderTargets(RenderTargets, ETERNAL_ARRAYSIZE(RenderTargets));
+	_Context.SetDepthBuffer(nullptr);
+	static_cast<Graphics::D3D11Context&>(_Context).GetD3D11Context()->OMSetDepthStencilState(nullptr, 0);
 
 	_Context.UnbindConstant<Graphics::Context::VERTEX>(0);
 	_Context.UnbindConstant<Graphics::Context::VERTEX>(1);
@@ -161,6 +179,8 @@ void RenderingTask::DoTask()
 	_Context.DrawIndexed(_DeferredQuad->GetVertexBuffer(), _DeferredQuad->GetIndexBuffer());
 	static_cast<Graphics::D3D11Renderer*>(Graphics::Renderer::Get())->Flush();
 
+	_Context.SetRenderTargets(RenderTargets, ETERNAL_ARRAYSIZE(RenderTargets));
+
 	_Context.UnbindSampler<Graphics::Context::PIXEL>(0);
 
 	_Context.UnbindBuffer<Graphics::Context::PIXEL>(0);
@@ -170,11 +190,12 @@ void RenderingTask::DoTask()
 	_Context.UnbindBuffer<Graphics::Context::PIXEL>(4);
 	_Context.UnbindBuffer<Graphics::Context::PIXEL>(5);
 
-	_Context.SetRenderTargets(RenderTargets, ETERNAL_ARRAYSIZE(RenderTargets));
-
 	_Context.UnbindShader<Graphics::Context::VERTEX>();
 	_Context.UnbindShader<Graphics::Context::PIXEL>();
 
+	static_cast<Graphics::D3D11Context&>(_Context).GetD3D11Context()->Flush();
+
+	OutputDebugString("RENDERED\n");
 	SetFinished();
 }
 

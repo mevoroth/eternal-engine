@@ -46,6 +46,9 @@
 #include "Transform/Transform.hpp"
 #include "Types/Types.hpp"
 #include "d3d11/D3D11PosUVVertexBuffer.hpp"
+#include "d3d11/D3D11DepthStencilBuffer.hpp"
+
+#include "FakeTask.hpp"
 
 using namespace Eternal::Graphics;
 using namespace Eternal::Import;
@@ -73,7 +76,7 @@ int WINAPI WinMain(HINSTANCE hInstance,
 
 	new ImportFbx();
 	GenericMesh<D3D11PosUVNormalVertexBuffer::PosUVNormalVertex, D3D11PosUVNormalVertexBuffer, D3D11UInt32IndexBuffer> MeshObj;
-	ImportFbx::Get()->Import("mesh.test.fbx", MeshObj);
+	ImportFbx::Get()->Import("sponza.fbx", MeshObj);
 
 	GenericMesh<D3D11PosUVVertexBuffer::PosUVVertex, D3D11PosUVVertexBuffer, D3D11UInt32IndexBuffer> Plane;
 	D3D11PosUVVertexBuffer::PosUVVertex PlaneVertices[] = {
@@ -104,6 +107,8 @@ int WINAPI WinMain(HINSTANCE hInstance,
 	Lights.push_back(Light(Vector3(0.f, 0.f, 0.f), 1.f));
 	Lights.push_back(Light(Vector3(0.f, 0.f, 0.f), 1.f));
 
+	D3D11DepthStencilBuffer DepthStencilBuffers(640, 480);
+
 	D3D11RenderTarget* RenderTargets[] = {
 		new D3D11RenderTarget(640, 480),
 		new D3D11RenderTarget(640, 480),
@@ -114,6 +119,7 @@ int WINAPI WinMain(HINSTANCE hInstance,
 	};
 
 	Transform CameraTransform;
+	Eternal::Sandbox::RenderingTask* Rendering = nullptr;
 
 	for (;;)
 	{
@@ -135,16 +141,20 @@ int WINAPI WinMain(HINSTANCE hInstance,
 			0.f
 		));
 
-		Eternal::Sandbox::RenderingTask* Rendering = new Eternal::Sandbox::RenderingTask(RendererObj, *RendererObj.GetMainContext(), &CameraObj, Lights);
+		Eternal::Sandbox::RenderingTask* PreviousRendering = Rendering;
+		Rendering = new Eternal::Sandbox::RenderingTask(RendererObj, *RendererObj.GetMainContext(), &CameraObj, Lights);
 		Rendering->SetViewMatrix(CameraTransform.GetModelMatrix());
 		//Rendering->SetMesh(&Plane);
 		Rendering->SetMesh(&MeshObj);
 		Rendering->SetDeferredQuad(&Plane);
 		Rendering->SetRenderTargets((RenderTarget**)&RenderTargets, ETERNAL_ARRAYSIZE(RenderTargets));
 		Rendering->SetBackBufferRenderTarget(RendererObj.GetBackBuffer());
-		TaskManagerObj.Push(Rendering);
-		while (!Rendering->IsFinished());
+		//TaskManagerObj.Push(Rendering, PreviousRendering);
+		//TaskManagerObj.Push(new FakeTask());
+		//while (!Rendering->IsFinished());
 		//delete Rendering;
+		Rendering->DoTask();
+		delete Rendering;
 	}
 
 	return 0;

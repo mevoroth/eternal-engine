@@ -19,6 +19,8 @@ namespace Eternal
 		class BlendState;
 		class Viewport;
 		class Sampler;
+		class D3D11DepthStencil;
+		class D3D11DepthStencilBuffer;
 	}
 	namespace Components
 	{
@@ -59,10 +61,12 @@ namespace Eternal
 			Graphics::Shader* _DeferredVS = nullptr;
 			Graphics::Shader* _DeferredPS = nullptr;
 			Graphics::RenderTarget** _RTs = nullptr;
+			Graphics::D3D11DepthStencilBuffer* _DepthStencilBuffer = nullptr;
 			Graphics::RenderTarget* _BackBuffer = nullptr;
 			uint32_t _RTCount = 0;
 			Graphics::BlendState* _BlendState = nullptr;
 			Graphics::Viewport* _Viewport = nullptr;
+			Graphics::D3D11DepthStencil* _DepthStencilState = nullptr;
 
 			Graphics::Sampler* _StandardSampler = nullptr;
 
