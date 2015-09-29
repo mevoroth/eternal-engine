@@ -17,9 +17,6 @@ sampler DefaultSampler : register(s0);
 
 float4 PS( PSIn IN ) : SV_Target0
 {
-	//float4 sampled = WorldPositionTexture.Sample(Sampler, IN.UV);
-	//return sampled / sampled.w;
-
 	GfxBuffer GfxBufferData;
 	GfxBufferData.Diffuse = DiffuseTexture.Sample(DefaultSampler, IN.UV).xyz;
 	GfxBufferData.MetallicSpecularRoughness = MetallicSpecularRoughnessTexture.Sample(DefaultSampler, IN.UV).xyz;
@@ -27,6 +24,6 @@ float4 PS( PSIn IN ) : SV_Target0
 	GfxBufferData.Normal = NormalTexture.Sample(DefaultSampler, IN.UV).xyz;
 	GfxBufferData.AmbientOcclusion = AmbientOcclusionTexture.Sample(DefaultSampler, IN.UV).xyz;
 
-	return float4(GfxBufferData.Diffuse, 1);
+	return float4(GfxBufferData.Normal, 1);
 	return float4(ComputeShading(GfxBufferData, 0, 0), 1);
 }

@@ -112,8 +112,8 @@ void RenderingTask::DoTask()
 
 	Graphics::Resource::LockedResource LockedResourceObj = ((Graphics::D3D11Constant*)_CameraConstant)->Lock(_Context, Graphics::Resource::LOCK_WRITE_DISCARD);
 	Matrix4x4* CameraMatrix = (Matrix4x4*)LockedResourceObj.Data;
-	//XMMATRIX ProjMatrix = XMMatrixTranspose(XMLoadFloat4x4(&_ViewMatrix));
-	XMMATRIX ProjMatrix = XMMatrixIdentity();
+	XMMATRIX ProjMatrix = XMMatrixTranspose(XMLoadFloat4x4(&_ViewMatrix));
+	//XMMATRIX ProjMatrix = XMMatrixIdentity();
 	_Camera->GetProjectionMatrix(*CameraMatrix);
 	XMStoreFloat4x4(CameraMatrix + 1, ProjMatrix);
 	((Graphics::D3D11Constant*)_CameraConstant)->Unlock(_Context);
@@ -142,7 +142,7 @@ void RenderingTask::DoTask()
 	//_ContextMatrix.m[3][1] = _ViewMatrix.m[3][1];
 	//_ContextMatrix.m[3][2] = _ViewMatrix.m[3][2];
 	//_Mesh->GetTransform().SetTranslation(Vector3(_ViewMatrix.m[3][0], _ViewMatrix.m[3][1], _ViewMatrix.m[3][2]));
-	_ContextMatrix = _ViewMatrix;
+	//_ContextMatrix = _ViewMatrix;
 	_Draw(_Mesh);
 	_ContextMatrix = _ModelContext.Head();
 	_ModelContext.Pop();

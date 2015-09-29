@@ -18,21 +18,17 @@ struct PSOut
 	float4 AmbiantOcclusion				: SV_TARGET5;
 };
 
-float ComputeLight(in float3 Pos, in float4 L, in float3 Normal)
-{
-	float3 Light = normalize(L.xyz - Pos);
-
-	return dot(-Normal, Light);// / Length;
-}
+Texture2D ObjectTexture : register(t0);
+sampler DefaultSampler : register(s0);
 
 PSOut PS( PSIn IN ) : SV_TARGET
 {
 	PSOut OUT = (PSOut)0;
 
-	OUT.Diffuse = float4(1.0f, 1.0f, 1.0f, 1.0f) * ComputeLight(IN.WorldPos.xyz, float4(Lights[0].Position, Lights[0].Distance), IN.Normal.xyz);
+	OUT.Diffuse = float4(1.0f, 1.0f, 1.0f, 1.0f);
 	OUT.MetallicSpecularRoughness = float4(0.f, 0.f, 0.f, 0.f);
-	OUT.Emissive = float4(1.0f, 1.0f, 1.0f, 1.0f);
-	OUT.Normal = float4(IN.UV, 0, 0);
+	OUT.Emissive = float4(0.f, 0.f, 0.f, 0.f);
+	OUT.Normal = IN.Normal;
 	OUT.WorldPosition = IN.WorldPos;
 	OUT.AmbiantOcclusion = float4(0.5f, 0.f, 0.5f, 1.0f);
 

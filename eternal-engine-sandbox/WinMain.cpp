@@ -47,15 +47,13 @@
 #include "Types/Types.hpp"
 #include "d3d11/D3D11PosUVVertexBuffer.hpp"
 #include "d3d11/D3D11DepthStencilBuffer.hpp"
-
-#include "FakeTask.hpp"
+#include "Core/TransformComponent.hpp"
 
 using namespace Eternal::Graphics;
 using namespace Eternal::Import;
 using namespace Eternal::Input;
 using namespace Eternal::Components;
 using namespace Eternal::Types;
-
 //void DrawMeshes(D3D11Renderer* renderer, const Mesh* mesh);
 
 int WINAPI WinMain(HINSTANCE hInstance,
@@ -118,43 +116,46 @@ int WINAPI WinMain(HINSTANCE hInstance,
 		new D3D11RenderTarget(640, 480)
 	};
 
-	Transform CameraTransform;
+	Eternal::Core::TransformComponent ParentTransform;
+	Eternal::Core::TransformComponent CameraTransform;
+	CameraTransform.AttachTo(&ParentTransform);
 	Eternal::Sandbox::RenderingTask* Rendering = nullptr;
 
 	for (;;)
 	{
 		Input::Get()->Update();
 
-		Vector3 Forward = CameraTransform.GetForward();
-		Vector3 Right = CameraTransform.GetRight();
-		Vector3 Up = CameraTransform.GetUp();
+		Vector3 Forward = CameraTransform.Transform.GetForward();
+		Vector3 Right = CameraTransform.Transform.GetRight();
+		Vector3 Up = ParentTransform.Transform.GetUp();
 
 		//CameraTransform.Translate(Input::Get()->GetAxis(Input::JOY0_LX) * 1.f * Right - Input::Get()->GetAxis(Input::JOY0_LY) * 1.f * Forward);
-		CameraTransform.Translate(Vector3(
-			Input::Get()->GetAxis(Input::JOY0_LX) * 1.f,
-			Input::Get()->GetAxis(Input::JOY0_RY) * 1.f,
-			-Input::Get()->GetAxis(Input::JOY0_LY) * 1.f
-		));
-		CameraTransform.Rotate(Vector3(
+		//ParentTransform.Transform.Translate(/*Vector3(
+		//	Input::Get()->GetAxis(Input::JOY0_LX) * 1.f,
+		//	-Input::Get()->GetAxis(Input::JOY0_RY) * 1.f,
+		//	-Input::Get()->GetAxis(Input::JOY0_LY) * 1.f
+		//)*/);
+		ParentTransform.Transform.Translate(Input::Get()->GetAxis(Input::JOY0_LX) * Right - Input::Get()->GetAxis(Input::JOY0_RY) * Up - Input::Get()->GetAxis(Input::JOY0_LY) * Forward);
+		CameraTransform.Transform.Rotate(Vector3(
 			0.f,
-			Input::Get()->GetAxis(Input::JOY0_RX) * 0.05f,
+			Input::Get()->GetAxis(Input::JOY0_RX) * 0.01f,
 			0.f
 		));
 
 		Eternal::Sandbox::RenderingTask* PreviousRendering = Rendering;
 		Rendering = new Eternal::Sandbox::RenderingTask(RendererObj, *RendererObj.GetMainContext(), &CameraObj, Lights);
-		Rendering->SetViewMatrix(CameraTransform.GetModelMatrix());
+		Rendering->SetViewMatrix(ParentTransform.Transform.GetModelMatrix() * CameraTransform.Transform.GetModelMatrix());
 		//Rendering->SetMesh(&Plane);
 		Rendering->SetMesh(&MeshObj);
 		Rendering->SetDeferredQuad(&Plane);
 		Rendering->SetRenderTargets((RenderTarget**)&RenderTargets, ETERNAL_ARRAYSIZE(RenderTargets));
 		Rendering->SetBackBufferRenderTarget(RendererObj.GetBackBuffer());
-		//TaskManagerObj.Push(Rendering, PreviousRendering);
+		TaskManagerObj.Push(Rendering, PreviousRendering);
 		//TaskManagerObj.Push(new FakeTask());
+		TaskManagerObj.Barrier();
 		//while (!Rendering->IsFinished());
+		//Rendering->DoTask();
 		//delete Rendering;
-		Rendering->DoTask();
-		delete Rendering;
 	}
 
 	return 0;

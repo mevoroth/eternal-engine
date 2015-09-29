@@ -16,6 +16,7 @@ VSOut VS( VSIn IN )
 	
 	OUT.Pos = IN.Pos;
 	OUT.UV = IN.UV;
+	OUT.UV.y = 1 - OUT.UV.y;
 	
 	return OUT;
 }
