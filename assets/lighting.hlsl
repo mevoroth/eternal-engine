@@ -13,6 +13,13 @@ struct GfxBuffer
 	float3 AmbientOcclusion;
 };
 
+struct LightBuffer
+{
+	float4 Color;
+	float3 Position;
+	float Distance;
+};
+
 float3 Diffuse(float3 DiffuseColor)
 {
 	return DiffuseColor * (1.0f / PI);

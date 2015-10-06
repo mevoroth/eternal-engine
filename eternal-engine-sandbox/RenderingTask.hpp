@@ -21,6 +21,7 @@ namespace Eternal
 		class Sampler;
 		class D3D11DepthStencil;
 		class D3D11DepthStencilBuffer;
+		class Texture;
 	}
 	namespace Components
 	{
@@ -39,7 +40,8 @@ namespace Eternal
 				_In_ Graphics::Renderer& RendererObj,
 				_In_ Graphics::Context& ContextObj,
 				_In_ Components::Camera* CameraObj,
-				_In_ const std::vector<Components::Light>& Lights
+				_In_ const std::vector<Components::Light>& Lights,
+				_In_ const void* TextureData
 			);
 			~RenderingTask();
 			virtual void DoTask() override;
@@ -70,7 +72,7 @@ namespace Eternal
 
 			Graphics::Sampler* _StandardSampler = nullptr;
 
-			Graphics::Constant* _LightsConstants = nullptr;
+			//Graphics::Constant* _LightsConstants = nullptr;
 			Graphics::Constant* _CameraConstant = nullptr;
 			Graphics::Constant* _ModelConstant = nullptr;
 
@@ -83,6 +85,8 @@ namespace Eternal
 			Types::Matrix4x4 _ContextMatrix;
 
 			Types::Matrix4x4 _ViewMatrix;
+
+			Graphics::Texture* _Texture = nullptr;
 		};
 	}
 }

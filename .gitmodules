@@ -10,3 +10,6 @@
 [submodule "eternal-engine-core"]
 	path = eternal-engine-core
 	url = git@github.com:mevoroth/eternal-engine-core.git
+[submodule "eternal-engine-extern"]
+	path = eternal-engine-extern
+	url = git@github.com:mevoroth/eternal-engine-extern.git

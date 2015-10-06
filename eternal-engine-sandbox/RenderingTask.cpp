@@ -29,7 +29,8 @@ RenderingTask::RenderingTask(
 	_In_ Graphics::Renderer& RendererObj,
 	_In_ Graphics::Context& ContextObj,
 	_In_ Components::Camera* CameraObj,
-	_In_ const std::vector<Components::Light>& Lights
+	_In_ const std::vector<Components::Light>& Lights,
+	_In_ const void* TextureData
 )
 	: _Renderer(RendererObj)
 	, _Context(ContextObj)
@@ -51,12 +52,12 @@ RenderingTask::RenderingTask(
 	_DeferredVS = Graphics::ShaderFactory::Get()->CreateVertexShader("Deferred", "deferred.vs.hlsl", PostProcessDataType, ETERNAL_ARRAYSIZE(PostProcessDataType));
 	_DeferredPS = Graphics::ShaderFactory::Get()->CreatePixelShader("Deferred", "deferred.ps.hlsl");
 	
-	_LightsConstants = new Graphics::D3D11Constant(sizeof(Components::Light) * 8, Graphics::D3D11Resource::IMMUTABLE, Graphics::D3D11Resource::NONE, (void*)&Lights[0]);
+	//_LightsConstants = new Graphics::D3D11Constant(sizeof(Components::Light) * 8, Graphics::D3D11Resource::IMMUTABLE, Graphics::D3D11Resource::NONE, (void*)&Lights[0]);
 	Types::Matrix4x4 CameraMatrix;
 	CameraObj->GetProjectionMatrix(CameraMatrix);
 	_CameraConstant = new Graphics::D3D11Constant(sizeof(Types::Matrix4x4) * 2, Graphics::D3D11Resource::DYNAMIC, Graphics::D3D11Resource::WRITE, (void*)&CameraMatrix);
 	_ModelConstant = new Graphics::D3D11Constant(sizeof(Types::Matrix4x4), Graphics::D3D11Resource::DYNAMIC, Graphics::D3D11Resource::WRITE, (void*)&_ContextMatrix);
-	_StandardSampler = new Graphics::D3D11Sampler(true, true, true, false, Graphics::Sampler::WRAP, Graphics::Sampler::WRAP, Graphics::Sampler::WRAP);
+	_StandardSampler = new Graphics::D3D11Sampler(false, false, false, false, Graphics::Sampler::WRAP, Graphics::Sampler::WRAP, Graphics::Sampler::WRAP);
 	_BlendState = new Graphics::D3D11BlendState(Graphics::BlendState::SRC_ALPHA, Graphics::BlendState::INV_SRC_ALPHA, Graphics::BlendState::OP_ADD,
 		Graphics::BlendState::SRC_ALPHA, Graphics::BlendState::INV_SRC_ALPHA, Graphics::BlendState::OP_ADD);
 	_Viewport = new Graphics::D3D11Viewport(0, 0, 640, 480);
@@ -66,14 +67,17 @@ RenderingTask::RenderingTask(
 	);
 	_DepthStencilBuffer = new Graphics::D3D11DepthStencilBuffer(640, 480);
 	_ContextMatrix = Types::NewIdentity();
+
+	_Texture = new Graphics::D3D11Texture(Graphics::Texture::BGRA8888, 2, 2, TextureData);
+
 	OutputDebugString("BEGINNING RENDERING\n");
 }
 
 RenderingTask::~RenderingTask()
 {
 	OutputDebugString("ENDING RENDERING\n");
-	delete _LightsConstants;
-	_LightsConstants = nullptr;
+	//delete _LightsConstants;
+	//_LightsConstants = nullptr;
 	delete _CameraConstant;
 	_CameraConstant = nullptr;
 	delete _ModelConstant;
@@ -88,6 +92,8 @@ RenderingTask::~RenderingTask()
 	_DepthStencilState = nullptr;
 	delete _DepthStencilBuffer;
 	_DepthStencilBuffer = nullptr;
+	delete _Texture;
+	_Texture = nullptr;
 }
 
 void RenderingTask::DoTask()
@@ -122,12 +128,10 @@ void RenderingTask::DoTask()
 	_Context.BindShader<Graphics::Context::GEOMETRY>(_GS);
 	_Context.BindShader<Graphics::Context::PIXEL>(_PS);
 
-	_Context.BindConstant<Graphics::Context::VERTEX>(0, _LightsConstants);
-	_Context.BindConstant<Graphics::Context::VERTEX>(1, _CameraConstant);
-	_Context.BindConstant<Graphics::Context::VERTEX>(2, _ModelConstant);
-	_Context.BindConstant<Graphics::Context::PIXEL>(0, _LightsConstants);
-	_Context.BindConstant<Graphics::Context::PIXEL>(1, _CameraConstant);
-	_Context.BindConstant<Graphics::Context::PIXEL>(2, _ModelConstant);
+	_Context.BindConstant<Graphics::Context::VERTEX>(0, _CameraConstant);
+	_Context.BindConstant<Graphics::Context::VERTEX>(1, _ModelConstant);
+	_Context.BindConstant<Graphics::Context::PIXEL>(0, _CameraConstant);
+	_Context.BindConstant<Graphics::Context::PIXEL>(1, _ModelConstant);
 
 	_Context.SetBlendMode(_BlendState);
 	_Context.SetViewport(_Viewport);
@@ -153,10 +157,8 @@ void RenderingTask::DoTask()
 
 	_Context.UnbindConstant<Graphics::Context::VERTEX>(0);
 	_Context.UnbindConstant<Graphics::Context::VERTEX>(1);
-	_Context.UnbindConstant<Graphics::Context::VERTEX>(2);
 	_Context.UnbindConstant<Graphics::Context::PIXEL>(0);
 	_Context.UnbindConstant<Graphics::Context::PIXEL>(1);
-	_Context.UnbindConstant<Graphics::Context::PIXEL>(2);
 
 	_Context.UnbindShader<Graphics::Context::VERTEX>();
 	_Context.UnbindShader<Graphics::Context::GEOMETRY>();
@@ -168,7 +170,8 @@ void RenderingTask::DoTask()
 	_Context.BindBuffer<Graphics::Context::PIXEL>(0, (Graphics::D3D11RenderTarget*)_RTs[0]);
 	_Context.BindBuffer<Graphics::Context::PIXEL>(1, (Graphics::D3D11RenderTarget*)_RTs[1]);
 	_Context.BindBuffer<Graphics::Context::PIXEL>(2, (Graphics::D3D11RenderTarget*)_RTs[2]);
-	_Context.BindBuffer<Graphics::Context::PIXEL>(3, (Graphics::D3D11RenderTarget*)_RTs[3]);
+	//_Context.BindBuffer<Graphics::Context::PIXEL>(3, (Graphics::D3D11RenderTarget*)_RTs[3]);
+	_Context.BindBuffer<Graphics::Context::PIXEL>(3, (Graphics::D3D11Texture*)_Texture);
 	_Context.BindBuffer<Graphics::Context::PIXEL>(4, (Graphics::D3D11RenderTarget*)_RTs[4]);
 	_Context.BindBuffer<Graphics::Context::PIXEL>(5, (Graphics::D3D11RenderTarget*)_RTs[5]);
 

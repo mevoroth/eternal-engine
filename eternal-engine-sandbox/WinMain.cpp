@@ -49,6 +49,8 @@
 #include "d3d11/D3D11DepthStencilBuffer.hpp"
 #include "Core/TransformComponent.hpp"
 
+#include "Import/tga/ImportTga.hpp"
+
 using namespace Eternal::Graphics;
 using namespace Eternal::Import;
 using namespace Eternal::Input;
@@ -71,6 +73,28 @@ int WINAPI WinMain(HINSTANCE hInstance,
 	D3D11ShaderFactory ShaderFactoryObj;
 	
 	new Eternal::Input::WinInput();
+
+	new ImportTga();
+	uint32_t height, width;
+	uint8_t* Content = ImportTga::Get()->Import("test.tga", height, width);
+	//uint32_t Content[] = {
+	//	0xFFFF0000, 0xFF00FF00, 0xFF0000FF, 0xFF000000, 0xFFFF0000, 0xFF00FF00, 0xFF0000FF, 0xFF000000, 0xFFFF0000, 0xFF00FF00, 0xFF0000FF, 0xFF000000, 0xFFFF0000, 0xFF00FF00, 0xFF0000FF, 0xFF000000,
+	//	0xFFFF0000, 0xFF00FF00, 0xFF0000FF, 0xFF000000, 0xFFFF0000, 0xFF00FF00, 0xFF0000FF, 0xFF000000, 0xFFFF0000, 0xFF00FF00, 0xFF0000FF, 0xFF000000, 0xFFFF0000, 0xFF00FF00, 0xFF0000FF, 0xFF000000,
+	//	0xFFFF0000, 0xFF00FF00, 0xFF0000FF, 0xFF000000, 0xFFFF0000, 0xFF00FF00, 0xFF0000FF, 0xFF000000, 0xFFFF0000, 0xFF00FF00, 0xFF0000FF, 0xFF000000, 0xFFFF0000, 0xFF00FF00, 0xFF0000FF, 0xFF000000,
+	//	0xFFFF0000, 0xFF00FF00, 0xFF0000FF, 0xFF000000, 0xFFFF0000, 0xFF00FF00, 0xFF0000FF, 0xFF000000, 0xFFFF0000, 0xFF00FF00, 0xFF0000FF, 0xFF000000, 0xFFFF0000, 0xFF00FF00, 0xFF0000FF, 0xFF000000,
+	//	0xFFFF0000, 0xFF00FF00, 0xFF0000FF, 0xFF000000, 0xFFFF0000, 0xFF00FF00, 0xFF0000FF, 0xFF000000, 0xFFFF0000, 0xFF00FF00, 0xFF0000FF, 0xFF000000, 0xFFFF0000, 0xFF00FF00, 0xFF0000FF, 0xFF000000,
+	//	0xFFFF0000, 0xFF00FF00, 0xFF0000FF, 0xFF000000, 0xFFFF0000, 0xFF00FF00, 0xFF0000FF, 0xFF000000, 0xFFFF0000, 0xFF00FF00, 0xFF0000FF, 0xFF000000, 0xFFFF0000, 0xFF00FF00, 0xFF0000FF, 0xFF000000,
+	//	0xFFFF0000, 0xFF00FF00, 0xFF0000FF, 0xFF000000, 0xFFFF0000, 0xFF00FF00, 0xFF0000FF, 0xFF000000, 0xFFFF0000, 0xFF00FF00, 0xFF0000FF, 0xFF000000, 0xFFFF0000, 0xFF00FF00, 0xFF0000FF, 0xFF000000,
+	//	0xFFFF0000, 0xFF00FF00, 0xFF0000FF, 0xFF000000, 0xFFFF0000, 0xFF00FF00, 0xFF0000FF, 0xFF000000, 0xFFFF0000, 0xFF00FF00, 0xFF0000FF, 0xFF000000, 0xFFFF0000, 0xFF00FF00, 0xFF0000FF, 0xFF000000,
+	//	0xFFFF0000, 0xFF00FF00, 0xFF0000FF, 0xFF000000, 0xFFFF0000, 0xFF00FF00, 0xFF0000FF, 0xFF000000, 0xFFFF0000, 0xFF00FF00, 0xFF0000FF, 0xFF000000, 0xFFFF0000, 0xFF00FF00, 0xFF0000FF, 0xFF000000,
+	//	0xFFFF0000, 0xFF00FF00, 0xFF0000FF, 0xFF000000, 0xFFFF0000, 0xFF00FF00, 0xFF0000FF, 0xFF000000, 0xFFFF0000, 0xFF00FF00, 0xFF0000FF, 0xFF000000, 0xFFFF0000, 0xFF00FF00, 0xFF0000FF, 0xFF000000,
+	//	0xFFFF0000, 0xFF00FF00, 0xFF0000FF, 0xFF000000, 0xFFFF0000, 0xFF00FF00, 0xFF0000FF, 0xFF000000, 0xFFFF0000, 0xFF00FF00, 0xFF0000FF, 0xFF000000, 0xFFFF0000, 0xFF00FF00, 0xFF0000FF, 0xFF000000,
+	//	0xFFFF0000, 0xFF00FF00, 0xFF0000FF, 0xFF000000, 0xFFFF0000, 0xFF00FF00, 0xFF0000FF, 0xFF000000, 0xFFFF0000, 0xFF00FF00, 0xFF0000FF, 0xFF000000, 0xFFFF0000, 0xFF00FF00, 0xFF0000FF, 0xFF000000,
+	//	0xFFFF0000, 0xFF00FF00, 0xFF0000FF, 0xFF000000, 0xFFFF0000, 0xFF00FF00, 0xFF0000FF, 0xFF000000, 0xFFFF0000, 0xFF00FF00, 0xFF0000FF, 0xFF000000, 0xFFFF0000, 0xFF00FF00, 0xFF0000FF, 0xFF000000,
+	//	0xFFFF0000, 0xFF00FF00, 0xFF0000FF, 0xFF000000, 0xFFFF0000, 0xFF00FF00, 0xFF0000FF, 0xFF000000, 0xFFFF0000, 0xFF00FF00, 0xFF0000FF, 0xFF000000, 0xFFFF0000, 0xFF00FF00, 0xFF0000FF, 0xFF000000,
+	//	0xFFFF0000, 0xFF00FF00, 0xFF0000FF, 0xFF000000, 0xFFFF0000, 0xFF00FF00, 0xFF0000FF, 0xFF000000, 0xFFFF0000, 0xFF00FF00, 0xFF0000FF, 0xFF000000, 0xFFFF0000, 0xFF00FF00, 0xFF0000FF, 0xFF000000,
+	//	0xFFFF0000, 0xFF00FF00, 0xFF0000FF, 0xFF000000, 0xFFFF0000, 0xFF00FF00, 0xFF0000FF, 0xFF000000, 0xFFFF0000, 0xFF00FF00, 0xFF0000FF, 0xFF000000, 0xFFFF0000, 0xFF00FF00, 0xFF0000FF, 0xFF000000
+	//};
 
 	new ImportFbx();
 	GenericMesh<D3D11PosUVNormalVertexBuffer::PosUVNormalVertex, D3D11PosUVNormalVertexBuffer, D3D11UInt32IndexBuffer> MeshObj;
@@ -98,7 +122,7 @@ int WINAPI WinMain(HINSTANCE hInstance,
 		Plane.PushTriangle(Triangle[0], Triangle[1], Triangle[2]);
 	}
 
-	PerspectiveCamera CameraObj(0.1f, 1000.f, 135.f);
+	PerspectiveCamera CameraObj(0.1f, 10000.f, 60.f);
 	OrthographicCamera OrthoCamObj(0.f, 1000.f, 1.f);
 
 	std::vector<Light> Lights;
@@ -125,6 +149,12 @@ int WINAPI WinMain(HINSTANCE hInstance,
 	{
 		Input::Get()->Update();
 
+		CameraTransform.Transform.Rotate(Vector3(
+			0.f,
+			Input::Get()->GetAxis(Input::JOY0_RX) * 0.01f,
+			0.f
+		));
+
 		Vector3 Forward = CameraTransform.Transform.GetForward();
 		Vector3 Right = CameraTransform.Transform.GetRight();
 		Vector3 Up = ParentTransform.Transform.GetUp();
@@ -136,26 +166,20 @@ int WINAPI WinMain(HINSTANCE hInstance,
 		//	-Input::Get()->GetAxis(Input::JOY0_LY) * 1.f
 		//)*/);
 		ParentTransform.Transform.Translate(Input::Get()->GetAxis(Input::JOY0_LX) * Right - Input::Get()->GetAxis(Input::JOY0_RY) * Up - Input::Get()->GetAxis(Input::JOY0_LY) * Forward);
-		CameraTransform.Transform.Rotate(Vector3(
-			0.f,
-			Input::Get()->GetAxis(Input::JOY0_RX) * 0.01f,
-			0.f
-		));
 
 		Eternal::Sandbox::RenderingTask* PreviousRendering = Rendering;
-		Rendering = new Eternal::Sandbox::RenderingTask(RendererObj, *RendererObj.GetMainContext(), &CameraObj, Lights);
+		Rendering = new Eternal::Sandbox::RenderingTask(RendererObj, *RendererObj.GetMainContext(), &CameraObj, Lights, Content);
 		Rendering->SetViewMatrix(ParentTransform.Transform.GetModelMatrix() * CameraTransform.Transform.GetModelMatrix());
 		//Rendering->SetMesh(&Plane);
 		Rendering->SetMesh(&MeshObj);
 		Rendering->SetDeferredQuad(&Plane);
 		Rendering->SetRenderTargets((RenderTarget**)&RenderTargets, ETERNAL_ARRAYSIZE(RenderTargets));
 		Rendering->SetBackBufferRenderTarget(RendererObj.GetBackBuffer());
-		TaskManagerObj.Push(Rendering, PreviousRendering);
 		//TaskManagerObj.Push(new FakeTask());
-		TaskManagerObj.Barrier();
-		//while (!Rendering->IsFinished());
-		//Rendering->DoTask();
-		//delete Rendering;
+		//TaskManagerObj.Push(Rendering);
+		//TaskManagerObj.Barrier();
+		Rendering->DoTask();
+		delete Rendering;
 	}
 
 	return 0;
