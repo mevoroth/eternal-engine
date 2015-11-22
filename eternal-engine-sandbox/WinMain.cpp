@@ -35,8 +35,8 @@
 #include "Input/Win/WinInput.hpp"
 
 #include <stack>
-#include <gl/GL.h>
 
+#include <limits>
 #include "d3d11/D3D11ShaderFactory.hpp"
 #include "Parallel/TaskManager.hpp"
 #include "RenderingTask.hpp"
@@ -50,6 +50,7 @@
 #include "Core/TransformComponent.hpp"
 
 #include "Import/tga/ImportTga.hpp"
+#include "Resources/TextureFactory.hpp"
 
 using namespace Eternal::Graphics;
 using namespace Eternal::Import;
@@ -95,6 +96,8 @@ int WINAPI WinMain(HINSTANCE hInstance,
 	//	0xFFFF0000, 0xFF00FF00, 0xFF0000FF, 0xFF000000, 0xFFFF0000, 0xFF00FF00, 0xFF0000FF, 0xFF000000, 0xFFFF0000, 0xFF00FF00, 0xFF0000FF, 0xFF000000, 0xFFFF0000, 0xFF00FF00, 0xFF0000FF, 0xFF000000,
 	//	0xFFFF0000, 0xFF00FF00, 0xFF0000FF, 0xFF000000, 0xFFFF0000, 0xFF00FF00, 0xFF0000FF, 0xFF000000, 0xFFFF0000, 0xFF00FF00, 0xFF0000FF, 0xFF000000, 0xFFFF0000, 0xFF00FF00, 0xFF0000FF, 0xFF000000
 	//};
+	
+	new Eternal::Resources::TextureFactory();
 
 	new ImportFbx();
 	GenericMesh<D3D11PosUVNormalVertexBuffer::PosUVNormalVertex, D3D11PosUVNormalVertexBuffer, D3D11UInt32IndexBuffer> MeshObj;
@@ -128,6 +131,12 @@ int WINAPI WinMain(HINSTANCE hInstance,
 	std::vector<Light> Lights;
 	Lights.push_back(Light(Vector3(0.f, 0.f, 0.f), 1.f));
 	Lights.push_back(Light(Vector3(0.f, 0.f, 0.f), 1.f));
+	Lights.push_back(Light(Vector3(std::numeric_limits<float>::quiet_NaN(), std::numeric_limits<float>::quiet_NaN(), std::numeric_limits<float>::quiet_NaN()), 1.f));
+	Lights.push_back(Light(Vector3(std::numeric_limits<float>::quiet_NaN(), std::numeric_limits<float>::quiet_NaN(), std::numeric_limits<float>::quiet_NaN()), 1.f));
+	Lights.push_back(Light(Vector3(std::numeric_limits<float>::quiet_NaN(), std::numeric_limits<float>::quiet_NaN(), std::numeric_limits<float>::quiet_NaN()), 1.f));
+	Lights.push_back(Light(Vector3(std::numeric_limits<float>::quiet_NaN(), std::numeric_limits<float>::quiet_NaN(), std::numeric_limits<float>::quiet_NaN()), 1.f));
+	Lights.push_back(Light(Vector3(std::numeric_limits<float>::quiet_NaN(), std::numeric_limits<float>::quiet_NaN(), std::numeric_limits<float>::quiet_NaN()), 1.f));
+	Lights.push_back(Light(Vector3(std::numeric_limits<float>::quiet_NaN(), std::numeric_limits<float>::quiet_NaN(), std::numeric_limits<float>::quiet_NaN()), 1.f));
 
 	D3D11DepthStencilBuffer DepthStencilBuffers(640, 480);
 

@@ -25,7 +25,8 @@ PSOut PS( PSIn IN ) : SV_TARGET
 {
 	PSOut OUT = (PSOut)0;
 
-	OUT.Diffuse = float4(1.0f, 1.0f, 1.0f, 1.0f);
+	//OUT.Diffuse = float4(1.0f, 1.0f, 1.0f, 1.0f);
+	OUT.Diffuse = ObjectTexture.Sample(DefaultSampler, IN.UV);
 	OUT.MetallicSpecularRoughness = float4(0.f, 0.f, 0.f, 0.f);
 	OUT.Emissive = float4(0.f, 0.f, 0.f, 0.f);
 	OUT.Normal = IN.Normal;

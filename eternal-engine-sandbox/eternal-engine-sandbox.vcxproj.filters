@@ -29,21 +29,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="..\Debug\default.ps.hlsl">
-      <Filter>Fichiers de ressources</Filter>
-    </FxCompile>
-    <FxCompile Include="..\Debug\default.vs.hlsl">
-      <Filter>Fichiers de ressources</Filter>
-    </FxCompile>
-    <FxCompile Include="..\Debug\default.gs.hlsl">
-      <Filter>Fichiers de ressources</Filter>
-    </FxCompile>
-    <FxCompile Include="..\Debug\deferred.ps.hlsl">
-      <Filter>Fichiers de ressources</Filter>
-    </FxCompile>
-    <FxCompile Include="..\Debug\deferred.vs.hlsl">
-      <Filter>Fichiers de ressources</Filter>
-    </FxCompile>
     <FxCompile Include="..\assets\debug.gs.hlsl">
       <Filter>Fichiers de ressources</Filter>
     </FxCompile>
@@ -54,6 +39,24 @@
       <Filter>Fichiers de ressources</Filter>
     </FxCompile>
     <FxCompile Include="..\assets\default.constants.hlsl">
+      <Filter>Fichiers de ressources</Filter>
+    </FxCompile>
+    <FxCompile Include="..\assets\default.gs.hlsl">
+      <Filter>Fichiers de ressources</Filter>
+    </FxCompile>
+    <FxCompile Include="..\assets\default.ps.hlsl">
+      <Filter>Fichiers de ressources</Filter>
+    </FxCompile>
+    <FxCompile Include="..\assets\default.vs.hlsl">
+      <Filter>Fichiers de ressources</Filter>
+    </FxCompile>
+    <FxCompile Include="..\assets\deferred.constants.hlsl">
+      <Filter>Fichiers de ressources</Filter>
+    </FxCompile>
+    <FxCompile Include="..\assets\deferred.ps.hlsl">
+      <Filter>Fichiers de ressources</Filter>
+    </FxCompile>
+    <FxCompile Include="..\assets\deferred.vs.hlsl">
       <Filter>Fichiers de ressources</Filter>
     </FxCompile>
   </ItemGroup>

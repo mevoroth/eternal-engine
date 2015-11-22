@@ -21,6 +21,8 @@
 
 #include "d3d11/D3D11Context.hpp"
 
+#include "Resources/TextureFactory.hpp"
+
 using namespace Eternal;
 using namespace Eternal::Sandbox;
 using namespace Eternal::Types;
@@ -68,7 +70,7 @@ RenderingTask::RenderingTask(
 	_DepthStencilBuffer = new Graphics::D3D11DepthStencilBuffer(640, 480);
 	_ContextMatrix = Types::NewIdentity();
 
-	_Texture = new Graphics::D3D11Texture(Graphics::Texture::BGRA8888, 2, 2, TextureData);
+	//_Texture = new Graphics::D3D11Texture(Graphics::Texture::BGRA8888, 2, 2, TextureData);
 
 	OutputDebugString("BEGINNING RENDERING\n");
 }
@@ -92,8 +94,8 @@ RenderingTask::~RenderingTask()
 	_DepthStencilState = nullptr;
 	delete _DepthStencilBuffer;
 	_DepthStencilBuffer = nullptr;
-	delete _Texture;
-	_Texture = nullptr;
+	//delete _Texture;
+	//_Texture = nullptr;
 }
 
 void RenderingTask::DoTask()
@@ -136,6 +138,8 @@ void RenderingTask::DoTask()
 	_Context.SetBlendMode(_BlendState);
 	_Context.SetViewport(_Viewport);
 
+	_Context.BindSampler<Graphics::Context::PIXEL>(0, _StandardSampler);
+
 	static_cast<Graphics::D3D11Context&>(_Context).GetD3D11Context()->OMSetDepthStencilState(_DepthStencilState->GetD3D11DepthStencilState(), 0);
 	_Context.SetDepthBuffer(_DepthStencilBuffer);
 	_Context.SetRenderTargets(_RTs, _RTCount);
@@ -155,6 +159,8 @@ void RenderingTask::DoTask()
 	_Context.SetDepthBuffer(nullptr);
 	static_cast<Graphics::D3D11Context&>(_Context).GetD3D11Context()->OMSetDepthStencilState(nullptr, 0);
 
+	_Context.UnbindSampler<Graphics::Context::PIXEL>(0);
+
 	_Context.UnbindConstant<Graphics::Context::VERTEX>(0);
 	_Context.UnbindConstant<Graphics::Context::VERTEX>(1);
 	_Context.UnbindConstant<Graphics::Context::PIXEL>(0);
@@ -170,8 +176,8 @@ void RenderingTask::DoTask()
 	_Context.BindBuffer<Graphics::Context::PIXEL>(0, (Graphics::D3D11RenderTarget*)_RTs[0]);
 	_Context.BindBuffer<Graphics::Context::PIXEL>(1, (Graphics::D3D11RenderTarget*)_RTs[1]);
 	_Context.BindBuffer<Graphics::Context::PIXEL>(2, (Graphics::D3D11RenderTarget*)_RTs[2]);
-	//_Context.BindBuffer<Graphics::Context::PIXEL>(3, (Graphics::D3D11RenderTarget*)_RTs[3]);
-	_Context.BindBuffer<Graphics::Context::PIXEL>(3, (Graphics::D3D11Texture*)_Texture);
+	_Context.BindBuffer<Graphics::Context::PIXEL>(3, (Graphics::D3D11RenderTarget*)_RTs[3]);
+	//_Context.BindBuffer<Graphics::Context::PIXEL>(3, (Graphics::D3D11Texture*)_Texture);
 	_Context.BindBuffer<Graphics::Context::PIXEL>(4, (Graphics::D3D11RenderTarget*)_RTs[4]);
 	_Context.BindBuffer<Graphics::Context::PIXEL>(5, (Graphics::D3D11RenderTarget*)_RTs[5]);
 
@@ -237,7 +243,18 @@ void RenderingTask::_Draw(_In_ Components::Mesh* MeshObj)
 		Graphics::Resource::LockedResource LockedResourceObj = ((Graphics::D3D11Constant*)_ModelConstant)->Lock(_Context, Graphics::Resource::LOCK_WRITE_DISCARD);
 		memcpy(LockedResourceObj.Data, &_ContextMatrix, sizeof(Matrix4x4));
 		((Graphics::D3D11Constant*)_ModelConstant)->Unlock(_Context);
-		_Context.DrawIndexed(MeshObj->GetVertexBuffer(), MeshObj->GetIndexBuffer());
+
+		if (MeshObj->_Texture.length())
+		{
+			uint32_t W, H;
+			uint8_t* Data = Eternal::Resources::TextureFactory::Get()->GetTexture(MeshObj->_Texture, H, W);
+			ETERNAL_ASSERT(Data);
+			Graphics::D3D11Texture* TempTex = new Graphics::D3D11Texture(Graphics::Texture::BGRA8888, Graphics::D3D11Resource::DYNAMIC, Graphics::D3D11Resource::WRITE, W, H, Data);
+			_Context.BindBuffer<Graphics::Context::PIXEL>(0, TempTex);
+			_Context.DrawIndexed(MeshObj->GetVertexBuffer(), MeshObj->GetIndexBuffer());
+			_Context.UnbindBuffer<Graphics::Context::PIXEL>(0);
+			delete TempTex;
+		}
 	}
 	for (uint32_t SubMeshIndex = 0; SubMeshIndex < MeshObj->GetSubMeshesCount(); ++SubMeshIndex)
 	{
