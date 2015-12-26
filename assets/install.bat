@@ -13,6 +13,9 @@ mklink deferred.vs.hlsl ..\assets\deferred.vs.hlsl
 mklink lighting.hlsl ..\assets\lighting.hlsl
 mklink definitions.hlsl ..\assets\definitions.hlsl
 mklink functions.hlsl ..\assets\functions.hlsl
+mklink water.vs.hlsl ..\assets\water.vs.hlsl
+mklink water.ps.hlsl ..\assets\water.ps.hlsl
+mklink water.common.hlsl ..\assets\water.common.hlsl
 mklink libfbxsdk.dll "C:\Program Files\Autodesk\FBX\FBX SDK\2015.1\lib\vs2013\x86\debug\libfbxsdk.dll"
 mklink mesh.test.fbx ..\assets\mesh.test.fbx
 mklink sponza.fbx ..\assets\sponza.fbx
@@ -87,6 +90,9 @@ mklink deferred.vs.hlsl ..\..\assets\deferred.vs.hlsl
 mklink lighting.hlsl ..\..\assets\lighting.hlsl
 mklink definitions.hlsl ..\..\assets\definitions.hlsl
 mklink functions.hlsl ..\..\assets\functions.hlsl
+mklink water.vs.hlsl ..\..\assets\water.vs.hlsl
+mklink water.ps.hlsl ..\..\assets\water.ps.hlsl
+mklink water.common.hlsl ..\..\assets\water.common.hlsl
 mklink libfbxsdk.dll "C:\Program Files\Autodesk\FBX\FBX SDK\2015.1\lib\vs2013\x64\debug\libfbxsdk.dll"
 mklink mesh.test.fbx ..\..\assets\mesh.test.fbx
 mklink sponza.fbx ..\..\assets\sponza.fbx

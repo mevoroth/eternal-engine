@@ -40,6 +40,7 @@
 #include "d3d11/D3D11ShaderFactory.hpp"
 #include "Parallel/TaskManager.hpp"
 #include "RenderingTask.hpp"
+#include "WaterTask.hpp"
 #include "Camera/PerspectiveCamera.hpp"
 #include "Camera/OrthographicCamera.hpp"
 #include "Light/Light.hpp"
@@ -154,6 +155,8 @@ int WINAPI WinMain(HINSTANCE hInstance,
 	CameraTransform.AttachTo(&ParentTransform);
 	Eternal::Sandbox::RenderingTask* Rendering = nullptr;
 
+	Eternal::Sandbox::WaterTask* WaterRendering = nullptr;
+
 	for (;;)
 	{
 		Input::Get()->Update();
@@ -176,19 +179,24 @@ int WINAPI WinMain(HINSTANCE hInstance,
 		//)*/);
 		ParentTransform.Transform.Translate(Input::Get()->GetAxis(Input::JOY0_LX) * Right - Input::Get()->GetAxis(Input::JOY0_RY) * Up - Input::Get()->GetAxis(Input::JOY0_LY) * Forward);
 
-		Eternal::Sandbox::RenderingTask* PreviousRendering = Rendering;
-		Rendering = new Eternal::Sandbox::RenderingTask(RendererObj, *RendererObj.GetMainContext(), &CameraObj, Lights, Content);
-		Rendering->SetViewMatrix(ParentTransform.Transform.GetModelMatrix() * CameraTransform.Transform.GetModelMatrix());
-		//Rendering->SetMesh(&Plane);
-		Rendering->SetMesh(&MeshObj);
-		Rendering->SetDeferredQuad(&Plane);
-		Rendering->SetRenderTargets((RenderTarget**)&RenderTargets, ETERNAL_ARRAYSIZE(RenderTargets));
-		Rendering->SetBackBufferRenderTarget(RendererObj.GetBackBuffer());
-		//TaskManagerObj.Push(new FakeTask());
-		//TaskManagerObj.Push(Rendering);
-		//TaskManagerObj.Barrier();
-		Rendering->DoTask();
-		delete Rendering;
+		WaterRendering = new Eternal::Sandbox::WaterTask(RendererObj, *RendererObj.GetMainContext());
+		WaterRendering->SetCamera(&CameraObj);
+		WaterRendering->SetViewMatrix(CameraTransform.Transform.GetModelMatrix());
+		WaterRendering->DoTask();
+		delete WaterRendering;
+		//Eternal::Sandbox::RenderingTask* PreviousRendering = Rendering;
+		//Rendering = new Eternal::Sandbox::RenderingTask(RendererObj, *RendererObj.GetMainContext(), &CameraObj, Lights, Content);
+		//Rendering->SetViewMatrix(ParentTransform.Transform.GetModelMatrix() * CameraTransform.Transform.GetModelMatrix());
+		////Rendering->SetMesh(&Plane);
+		//Rendering->SetMesh(&MeshObj);
+		//Rendering->SetDeferredQuad(&Plane);
+		//Rendering->SetRenderTargets((RenderTarget**)&RenderTargets, ETERNAL_ARRAYSIZE(RenderTargets));
+		//Rendering->SetBackBufferRenderTarget(RendererObj.GetBackBuffer());
+		////TaskManagerObj.Push(new FakeTask());
+		////TaskManagerObj.Push(Rendering);
+		////TaskManagerObj.Barrier();
+		//Rendering->DoTask();
+		//delete Rendering;
 	}
 
 	return 0;

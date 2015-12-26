@@ -27,6 +27,9 @@
     <ClCompile Include="FakeTask.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
+    <ClCompile Include="WaterTask.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\assets\debug.gs.hlsl">
@@ -59,6 +62,15 @@
     <FxCompile Include="..\assets\deferred.vs.hlsl">
       <Filter>Fichiers de ressources</Filter>
     </FxCompile>
+    <FxCompile Include="..\assets\water.common.hlsl">
+      <Filter>Fichiers de ressources</Filter>
+    </FxCompile>
+    <FxCompile Include="..\assets\water.ps.hlsl">
+      <Filter>Fichiers de ressources</Filter>
+    </FxCompile>
+    <FxCompile Include="..\assets\water.vs.hlsl">
+      <Filter>Fichiers de ressources</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SandboxGameState.hpp">
@@ -68,6 +80,9 @@
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
     <ClInclude Include="FakeTask.hpp">
+      <Filter>Fichiers d%27en-tête</Filter>
+    </ClInclude>
+    <ClInclude Include="WaterTask.hpp">
       <Filter>Fichiers d%27en-tête</Filter>
     </ClInclude>
   </ItemGroup>
