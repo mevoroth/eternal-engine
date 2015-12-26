@@ -27,7 +27,7 @@ VSOut VS( VSIn IN )
 
 	OUT.UV = IN.UV;
 	OUT.Normal = IN.Normal;
-	OUT.WorldPos = OUT.Pos;
+	OUT.WorldPos = IN.Pos;
 
 	return OUT;
 }

@@ -32,7 +32,8 @@
 #include "Mesh/GenericMesh.hpp"
 #include "Import/fbx/ImportFbx.hpp"
 
-#include "Input/Win/WinInput.hpp"
+#include "Input/XInput/XInput.hpp"
+#include "Input/WinInput/WinInput.hpp"
 
 #include <stack>
 
@@ -49,6 +50,7 @@
 #include "d3d11/D3D11PosUVVertexBuffer.hpp"
 #include "d3d11/D3D11DepthStencilBuffer.hpp"
 #include "Core/TransformComponent.hpp"
+#include "WindowsProcess.hpp"
 
 #include "Import/tga/ImportTga.hpp"
 #include "Resources/TextureFactory.hpp"
@@ -66,7 +68,13 @@ int WINAPI WinMain(HINSTANCE hInstance,
 	int nCmdShow)
 {
 	D3D11Device DeviceObj(hInstance, nCmdShow, "Eternal Sandbox", "EternalClass");
-	DeviceObj.Create();
+
+	Eternal::Input::WinInput* WinInputObj = new Eternal::Input::WinInput();
+	WindowsProcess WinProcObj;
+	WindowsProcess::SetInputHandler(Input::Get());
+	DeviceObj.Create(WindowsProcess::WindowProc);
+
+	Eternal::Input::XInput* XInputObj = new Eternal::Input::XInput();
 
 	D3D11Renderer RendererObj;
 
@@ -74,8 +82,6 @@ int WINAPI WinMain(HINSTANCE hInstance,
 
 	D3D11ShaderFactory ShaderFactoryObj;
 	
-	new Eternal::Input::WinInput();
-
 	new ImportTga();
 	uint32_t height, width;
 	uint8_t* Content = ImportTga::Get()->Import("test.tga", height, width);
@@ -130,7 +136,7 @@ int WINAPI WinMain(HINSTANCE hInstance,
 	OrthographicCamera OrthoCamObj(0.f, 1000.f, 1.f);
 
 	std::vector<Light> Lights;
-	Lights.push_back(Light(Vector3(0.f, 0.f, 0.f), 1.f));
+	Lights.push_back(Light(Vector3(0.f, 0.f, 100.f), 1.f));
 	Lights.push_back(Light(Vector3(0.f, 0.f, 0.f), 1.f));
 	Lights.push_back(Light(Vector3(std::numeric_limits<float>::quiet_NaN(), std::numeric_limits<float>::quiet_NaN(), std::numeric_limits<float>::quiet_NaN()), 1.f));
 	Lights.push_back(Light(Vector3(std::numeric_limits<float>::quiet_NaN(), std::numeric_limits<float>::quiet_NaN(), std::numeric_limits<float>::quiet_NaN()), 1.f));
@@ -159,7 +165,9 @@ int WINAPI WinMain(HINSTANCE hInstance,
 
 	for (;;)
 	{
-		Input::Get()->Update();
+		WindowsProcess::ExecuteMessageLoop();
+		WinInputObj->Update();
+		XInputObj->Update();
 
 		CameraTransform.Transform.Rotate(Vector3(
 			0.f,

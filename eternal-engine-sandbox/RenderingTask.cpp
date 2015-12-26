@@ -1,5 +1,7 @@
 #include "RenderingTask.hpp"
 
+#include <cmath>
+
 #include "Macros/Macros.hpp"
 #include "Graphics/ShaderFactory.hpp"
 #include "Graphics/Context.hpp"
@@ -20,6 +22,7 @@
 #include "Graphics/StencilTest.hpp"
 
 #include "d3d11/D3D11Context.hpp"
+#include "d3d11/D3D11Texture.hpp"
 
 #include "Resources/TextureFactory.hpp"
 
@@ -59,7 +62,7 @@ RenderingTask::RenderingTask(
 	CameraObj->GetProjectionMatrix(CameraMatrix);
 	_CameraConstant = new Graphics::D3D11Constant(sizeof(Types::Matrix4x4) * 2, Graphics::D3D11Resource::DYNAMIC, Graphics::D3D11Resource::WRITE, (void*)&CameraMatrix);
 	_ModelConstant = new Graphics::D3D11Constant(sizeof(Types::Matrix4x4), Graphics::D3D11Resource::DYNAMIC, Graphics::D3D11Resource::WRITE, (void*)&_ContextMatrix);
-	_StandardSampler = new Graphics::D3D11Sampler(false, false, false, false, Graphics::Sampler::WRAP, Graphics::Sampler::WRAP, Graphics::Sampler::WRAP);
+	_StandardSampler = new Graphics::D3D11Sampler(true, true, false, false, Graphics::Sampler::WRAP, Graphics::Sampler::WRAP, Graphics::Sampler::WRAP);
 	_BlendState = new Graphics::D3D11BlendState(Graphics::BlendState::SRC_ALPHA, Graphics::BlendState::INV_SRC_ALPHA, Graphics::BlendState::OP_ADD,
 		Graphics::BlendState::SRC_ALPHA, Graphics::BlendState::INV_SRC_ALPHA, Graphics::BlendState::OP_ADD);
 	_Viewport = new Graphics::D3D11Viewport(0, 0, 640, 480);
@@ -69,6 +72,13 @@ RenderingTask::RenderingTask(
 	);
 	_DepthStencilBuffer = new Graphics::D3D11DepthStencilBuffer(640, 480);
 	_ContextMatrix = Types::NewIdentity();
+
+	uint32_t Size = 256;
+	for (uint32_t TextureSizeIndex = 0; TextureSizeIndex < SIZE_COUNT; ++TextureSizeIndex)
+	{
+		_Textures[TextureSizeIndex] = new Graphics::D3D11Texture(Graphics::Texture::BGRA8888, Graphics::D3D11Resource::DYNAMIC, Graphics::Resource::WRITE, Size, Size);
+		Size *= 2;
+	}
 
 	//_Texture = new Graphics::D3D11Texture(Graphics::Texture::BGRA8888, 2, 2, TextureData);
 
@@ -94,8 +104,11 @@ RenderingTask::~RenderingTask()
 	_DepthStencilState = nullptr;
 	delete _DepthStencilBuffer;
 	_DepthStencilBuffer = nullptr;
-	//delete _Texture;
-	//_Texture = nullptr;
+	for (uint32_t TextureSizeIndex = 0; TextureSizeIndex < SIZE_COUNT; ++TextureSizeIndex)
+	{
+		delete _Textures[TextureSizeIndex];
+		_Textures[TextureSizeIndex] = nullptr;
+	}
 }
 
 void RenderingTask::DoTask()
@@ -246,14 +259,24 @@ void RenderingTask::_Draw(_In_ Components::Mesh* MeshObj)
 
 		if (MeshObj->_Texture.length())
 		{
-			uint32_t W, H;
-			uint8_t* Data = Eternal::Resources::TextureFactory::Get()->GetTexture(MeshObj->_Texture, H, W);
-			ETERNAL_ASSERT(Data);
-			Graphics::D3D11Texture* TempTex = new Graphics::D3D11Texture(Graphics::Texture::BGRA8888, Graphics::D3D11Resource::DYNAMIC, Graphics::D3D11Resource::WRITE, W, H, Data);
-			_Context.BindBuffer<Graphics::Context::PIXEL>(0, TempTex);
+			_Context.BindBuffer<Graphics::Context::PIXEL>(0, (Graphics::D3D11Texture*)Eternal::Resources::TextureFactory::Get()->GetTexture(MeshObj->_Texture));
 			_Context.DrawIndexed(MeshObj->GetVertexBuffer(), MeshObj->GetIndexBuffer());
 			_Context.UnbindBuffer<Graphics::Context::PIXEL>(0);
-			delete TempTex;
+			//uint32_t W, H;
+			//uint8_t* Data = Eternal::Resources::TextureFactory::Get()->GetTexture(MeshObj->_Texture, H, W);
+			//ETERNAL_ASSERT(Data);
+			//if (H >= 256)
+			//{
+			//	uint32_t TextureIndex = (uint32_t)(log2(H) - 8);
+			//	//Graphics::D3D11Texture* TempTex = new Graphics::D3D11Texture(Graphics::Texture::BGRA8888, Graphics::D3D11Resource::DYNAMIC, Graphics::D3D11Resource::WRITE, W, H, Data);
+			//	ETERNAL_ASSERT(TextureIndex < SIZE_COUNT);
+			//	Graphics::D3D11Resource::LockedResource LockedData = _Textures[TextureIndex]->Lock(_Context, Graphics::Resource::LOCK_WRITE_DISCARD);
+			//	memcpy(LockedData.Data, Data, H * W * 4);
+			//	_Textures[TextureIndex]->Unlock(_Context);
+			//	_Context.BindBuffer<Graphics::Context::PIXEL>(0, _Textures[TextureIndex]);
+			//	_Context.DrawIndexed(MeshObj->GetVertexBuffer(), MeshObj->GetIndexBuffer());
+			//	_Context.UnbindBuffer<Graphics::Context::PIXEL>(0);
+			//}
 		}
 	}
 	for (uint32_t SubMeshIndex = 0; SubMeshIndex < MeshObj->GetSubMeshesCount(); ++SubMeshIndex)

@@ -21,6 +21,7 @@ namespace Eternal
 		class Sampler;
 		class D3D11DepthStencil;
 		class D3D11DepthStencilBuffer;
+		class D3D11Texture;
 		class Texture;
 	}
 	namespace Components
@@ -34,6 +35,15 @@ namespace Eternal
 		class RenderingTask : public Parallel::Task
 		{
 		public:
+			enum TextureSize
+			{
+				SIZE_256 = 0,
+				SIZE_512,
+				SIZE_1024,
+				SIZE_2048,
+				SIZE_4096,
+				SIZE_COUNT
+			};
 			static const int STACK_SIZE = 64;
 
 			RenderingTask(
@@ -86,7 +96,7 @@ namespace Eternal
 
 			Types::Matrix4x4 _ViewMatrix;
 
-			Graphics::Texture* _Texture = nullptr;
+			Graphics::D3D11Texture* _Textures[SIZE_COUNT];
 		};
 	}
 }

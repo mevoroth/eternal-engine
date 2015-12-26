@@ -146,6 +146,7 @@
     <ClCompile Include="FakeTask.cpp" />
     <ClCompile Include="RenderingTask.cpp" />
     <ClCompile Include="SandboxGameState.cpp" />
+	<ClCompile Include="WindowsProcess.cpp" />
     <ClCompile Include="WaterTask.cpp" />
     <ClCompile Include="WinMain.cpp" />
   </ItemGroup>
@@ -225,6 +226,7 @@
     <ClInclude Include="FakeTask.hpp" />
     <ClInclude Include="RenderingTask.hpp" />
     <ClInclude Include="SandboxGameState.hpp" />
+    <ClInclude Include="WindowsProcess.hpp" />
     <ClInclude Include="WaterTask.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
