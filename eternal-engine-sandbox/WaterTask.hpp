@@ -13,6 +13,10 @@ namespace Eternal
 		class Shader;
 		class Constant;
 		class RenderTarget;
+		class Viewport;
+		class BlendState;
+		class D3D11DepthStencil;
+		class D3D11DepthStencilBuffer;
 	}
 
 	namespace Components
@@ -32,6 +36,8 @@ namespace Eternal
 		{
 		public:
 			WaterTask(Renderer& RendererObj, Context& ContextObj);
+			virtual ~WaterTask();
+
 			virtual void DoTask() override;
 			void SetCamera(Camera* CameraObj)
 			{
@@ -40,6 +46,10 @@ namespace Eternal
 			void SetViewMatrix(const Matrix4x4& ViewMatrix)
 			{
 				_ViewMatrix = ViewMatrix;
+			}
+			void SetMesh(Mesh* MeshObj)
+			{
+				_WaterPlane = MeshObj;
 			}
 
 		private:
@@ -52,6 +62,11 @@ namespace Eternal
 			Constant* _CameraConstant = nullptr;
 			Mesh* _WaterPlane = nullptr;
 			RenderTarget* _RenderTarget = nullptr;
+			RenderTarget* _BackBuffer = nullptr;
+			Viewport* _Viewport = nullptr;
+			BlendState* _BlendState = nullptr;
+			D3D11DepthStencil* _DepthStencilState = nullptr;
+			D3D11DepthStencilBuffer* _DepthStencilBuffer = nullptr;
 
 			Camera* _Camera = nullptr;
 			Matrix4x4 _ViewMatrix;

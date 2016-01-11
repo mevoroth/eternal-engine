@@ -16,6 +16,10 @@ mklink functions.hlsl ..\assets\functions.hlsl
 mklink water.vs.hlsl ..\assets\water.vs.hlsl
 mklink water.ps.hlsl ..\assets\water.ps.hlsl
 mklink water.common.hlsl ..\assets\water.common.hlsl
+mklink debugtext.vs.hlsl ..\assets\debugtext.vs.hlsl
+mklink debugtext.ps.hlsl ..\assets\debugtext.ps.hlsl
+mklink debugtext.common.hlsl ..\assets\debugtext.common.hlsl
+
 mklink libfbxsdk.dll "C:\Program Files\Autodesk\FBX\FBX SDK\2015.1\lib\vs2013\x86\debug\libfbxsdk.dll"
 mklink mesh.test.fbx ..\assets\mesh.test.fbx
 mklink sponza.fbx ..\assets\sponza.fbx
@@ -93,6 +97,10 @@ mklink functions.hlsl ..\..\assets\functions.hlsl
 mklink water.vs.hlsl ..\..\assets\water.vs.hlsl
 mklink water.ps.hlsl ..\..\assets\water.ps.hlsl
 mklink water.common.hlsl ..\..\assets\water.common.hlsl
+mklink debugtext.vs.hlsl ..\..\assets\debugtext.vs.hlsl
+mklink debugtext.ps.hlsl ..\..\assets\debugtext.ps.hlsl
+mklink debugtext.common.hlsl ..\..\assets\debugtext.common.hlsl
+
 mklink libfbxsdk.dll "C:\Program Files\Autodesk\FBX\FBX SDK\2015.1\lib\vs2013\x64\debug\libfbxsdk.dll"
 mklink mesh.test.fbx ..\..\assets\mesh.test.fbx
 mklink sponza.fbx ..\..\assets\sponza.fbx

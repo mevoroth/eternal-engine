@@ -18,12 +18,12 @@ struct LightBuffer
 	float Distance;
 };
 
-cbuffer LightsBuffer : register(c0)
+cbuffer LightsBuffer : register(b0)
 {
 	LightBuffer Lights[8];
 };
 
-cbuffer MatrixBuffer : register(c1)
+cbuffer MatrixBuffer : register(b1)
 {
 	//matrix Model;
 	//matrix View;
