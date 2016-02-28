@@ -38,7 +38,9 @@ namespace Eternal
 			WaterTask(Renderer& RendererObj, Context& ContextObj);
 			virtual ~WaterTask();
 
-			virtual void DoTask() override;
+			virtual void Setup() override;
+			virtual void Execute() override;
+			virtual bool TaskIsExecuted() override;
 			void SetCamera(Camera* CameraObj)
 			{
 				_Camera = CameraObj;
@@ -70,6 +72,8 @@ namespace Eternal
 
 			Camera* _Camera = nullptr;
 			Matrix4x4 _ViewMatrix;
+
+			bool _Executed = false;
 		};
 	}
 }

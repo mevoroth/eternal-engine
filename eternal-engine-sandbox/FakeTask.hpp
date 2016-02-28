@@ -5,26 +5,26 @@
 
 using namespace Eternal::Parallel;
 
+namespace Eternal
+{
+	namespace Parallel
+	{
+		class AtomicInt;
+	}
+}
+
 class FakeTask : public Task
 {
 public:
-	FakeTask()
-	{
-		machin = new int[1000000];
-	}
-	~FakeTask()
-	{
-		delete [] machin;
-	}
+	FakeTask();
+	~FakeTask();
 
-	virtual void DoTask() override
-	{
-		OutputDebugString("LEL");
-		SetFinished();
-	}
+	virtual bool TaskIsExecuted() override;
+	virtual void Setup() override;
+	virtual void Execute() override;
 
 private:
-	int* machin = nullptr;
+	AtomicInt* _State = nullptr;
 };
 
 #endif

@@ -13,11 +13,10 @@ cbuffer DebugTextParameters : register(b0)
 	// .zw : Screen Size
 	float4 PositionScreenSize;
 	float2 FontTableSize;
-	uint LineLength;
 };
 
-StructuredBuffer<uint> Line;
 Texture2D FontTableTexture : register(t0);
+StructuredBuffer<uint> Line : register(t1);
 sampler StandardSampler : register(s0);
 
 #define LETTER_SIZE	(float2(5.0f, 7.0f))

@@ -111,7 +111,12 @@ RenderingTask::~RenderingTask()
 	}
 }
 
-void RenderingTask::DoTask()
+void RenderingTask::Setup()
+{
+	_Executed = false;
+}
+
+void RenderingTask::Execute()
 {
 	Graphics::RenderTarget* RenderTargets[] = {
 		nullptr,
@@ -218,7 +223,12 @@ void RenderingTask::DoTask()
 	static_cast<Graphics::D3D11Context&>(_Context).GetD3D11Context()->Flush();
 
 	OutputDebugString("RENDERED\n");
-	SetFinished();
+	_Executed = true;
+}
+
+bool RenderingTask::TaskIsExecuted()
+{
+	return _Executed;
 }
 
 void RenderingTask::SetRenderTargets(_In_ Graphics::RenderTarget** RenderTargets, _In_ uint32_t Count)

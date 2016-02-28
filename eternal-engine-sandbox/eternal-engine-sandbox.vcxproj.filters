@@ -33,6 +33,9 @@
     <ClCompile Include="WaterTask.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
+    <ClCompile Include="DebugTextTask.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\assets\debug.gs.hlsl">

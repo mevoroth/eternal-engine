@@ -42,6 +42,7 @@
 #include "Parallel/TaskManager.hpp"
 #include "RenderingTask.hpp"
 #include "WaterTask.hpp"
+#include "DebugTextTask.hpp"
 #include "Camera/PerspectiveCamera.hpp"
 #include "Camera/OrthographicCamera.hpp"
 #include "Light/Light.hpp"
@@ -61,6 +62,8 @@ using namespace Eternal::Input;
 using namespace Eternal::Components;
 using namespace Eternal::Types;
 //void DrawMeshes(D3D11Renderer* renderer, const Mesh* mesh);
+
+void D3D12Main();
 
 int WINAPI WinMain(HINSTANCE hInstance,
 	HINSTANCE hPrevInstance,
@@ -112,10 +115,10 @@ int WINAPI WinMain(HINSTANCE hInstance,
 
 	GenericMesh<D3D11PosUVVertexBuffer::PosUVVertex, D3D11PosUVVertexBuffer, D3D11UInt32IndexBuffer> Plane;
 	D3D11PosUVVertexBuffer::PosUVVertex PlaneVertices[] = {
-		{ Vector4(-1000.f, 0.f, -1000.f, 1.f), Vector2(0.f, 0.f) },
-		{ Vector4(-1000.f, 0.f,  1000.f, 1.f), Vector2(0.f, 1.f) },
-		{ Vector4( 1000.f, 0.f,  1000.f, 1.f), Vector2(1.f, 1.f) },
-		{ Vector4( 1000.f, 0.f, -1000.f, 1.f), Vector2(1.f, 0.f) }
+		{ Vector4(-1000.f, -1000.f, 0.f, 1.f), Vector2(0.f, 0.f) },
+		{ Vector4(-1000.f,  1000.f, 0.f, 1.f), Vector2(0.f, 1.f) },
+		{ Vector4( 1000.f,  1000.f, 0.f, 1.f), Vector2(1.f, 1.f) },
+		{ Vector4( 1000.f, -1000.f, 0.f, 1.f), Vector2(1.f, 0.f) }
 	};
 	for (uint32_t VertexIndex = 0; VertexIndex < ETERNAL_ARRAYSIZE(PlaneVertices); ++VertexIndex)
 	{
@@ -162,11 +165,15 @@ int WINAPI WinMain(HINSTANCE hInstance,
 	Eternal::Sandbox::RenderingTask* Rendering = nullptr;
 
 	Eternal::Sandbox::WaterTask* WaterRendering = nullptr;
+	Eternal::Sandbox::DebugTextTask* DebugRendering = nullptr;
 
 	ParentTransform.Transform.SetTranslation(Vector3(0.f, -100.f, 0.f));
 	CameraTransform.Transform.Rotate(Vector3(0.f, 0.f, 0.f));
 	//CameraTransform.Transform.Rotate(Vector3(0.f, 45.f * 3.1415f / 180.f, 0.f));
 	//CameraTransform.Transform.Rotate(Vector3(0.f, 0.f, 45.f * 3.1415f / 180.f));
+
+	Rendering = new Eternal::Sandbox::RenderingTask(RendererObj, *RendererObj.GetMainContext(), &CameraObj, Lights, Content);
+	DebugRendering = new Eternal::Sandbox::DebugTextTask(RendererObj, *RendererObj.GetMainContext());
 
 	for (;;)
 	{
@@ -192,25 +199,25 @@ int WINAPI WinMain(HINSTANCE hInstance,
 		//)*/);
 		//ParentTransform.Transform.Translate(Input::Get()->GetAxis(Input::JOY0_LX) * Right - Input::Get()->GetAxis(Input::JOY0_RY) * Up - Input::Get()->GetAxis(Input::JOY0_LY) * Forward);
 
-		WaterRendering = new Eternal::Sandbox::WaterTask(RendererObj, *RendererObj.GetMainContext());
-		WaterRendering->SetCamera(&CameraObj);
-		Matrix4x4 Model = ParentTransform.Transform.GetModelMatrix();
-		WaterRendering->SetViewMatrix(ParentTransform.Transform.GetModelMatrix() * CameraTransform.Transform.GetModelMatrix());
-		WaterRendering->SetMesh(&Plane);
-		WaterRendering->DoTask();
-		delete WaterRendering;
+		//WaterRendering = new Eternal::Sandbox::WaterTask(RendererObj, *RendererObj.GetMainContext());
+		//WaterRendering->SetCamera(&CameraObj);
+		//Matrix4x4 Model = ParentTransform.Transform.GetModelMatrix();
+		//WaterRendering->SetViewMatrix(ParentTransform.Transform.GetModelMatrix() * CameraTransform.Transform.GetModelMatrix());
+		//WaterRendering->SetMesh(&Plane);
+		//WaterRendering->Execute();
+		//delete WaterRendering;
 
-		Matrix4x4 blabla;
-		//Vector4 posdemerde(-1000.f, -1000.f, 0.f, 1.f);
-		Vector4 posdemerde(-1000.f, 0.f, -1000.f, 1.f);
-		CameraObj.GetProjectionMatrix(blabla);
-		blabla = ParentTransform.Transform.GetModelMatrix() * CameraTransform.Transform.GetModelMatrix();
-		XMStoreFloat4x4(&blabla, XMMatrixTranspose(XMLoadFloat4x4(&blabla)));
-		XMVECTOR v = XMVector4Transform(XMLoadFloat4(&posdemerde), XMLoadFloat4x4(&blabla));
-		ETERNAL_ASSERT(true);
+		//Matrix4x4 blabla;
+		////Vector4 posdemerde(-1000.f, -1000.f, 0.f, 1.f);
+		//Vector4 posdemerde(-1000.f, 0.f, -1000.f, 1.f);
+		//CameraObj.GetProjectionMatrix(blabla);
+		//blabla = ParentTransform.Transform.GetModelMatrix() * CameraTransform.Transform.GetModelMatrix();
+		//XMStoreFloat4x4(&blabla, XMMatrixTranspose(XMLoadFloat4x4(&blabla)));
+		//XMVECTOR v = XMVector4Transform(XMLoadFloat4(&posdemerde), XMLoadFloat4x4(&blabla));
+		//ETERNAL_ASSERT(true);
 
 		//Eternal::Sandbox::RenderingTask* PreviousRendering = Rendering;
-		//Rendering = new Eternal::Sandbox::RenderingTask(RendererObj, *RendererObj.GetMainContext(), &CameraObj, Lights, Content);
+		////Rendering = new Eternal::Sandbox::RenderingTask(RendererObj, *RendererObj.GetMainContext(), &CameraObj, Lights, Content);
 		//Rendering->SetViewMatrix(ParentTransform.Transform.GetModelMatrix() * CameraTransform.Transform.GetModelMatrix());
 		////Rendering->SetMesh(&Plane);
 		//Rendering->SetMesh(&MeshObj);
@@ -218,11 +225,23 @@ int WINAPI WinMain(HINSTANCE hInstance,
 		//Rendering->SetRenderTargets((RenderTarget**)&RenderTargets, ETERNAL_ARRAYSIZE(RenderTargets));
 		//Rendering->SetBackBufferRenderTarget(RendererObj.GetBackBuffer());
 		////TaskManagerObj.Push(new FakeTask());
+		////Rendering->Setup();
 		////TaskManagerObj.Push(Rendering);
 		////TaskManagerObj.Barrier();
-		//Rendering->DoTask();
-		//delete Rendering;
+		//Rendering->Execute();
+		////delete Rendering;
+		
+		DebugRendering->Setup();
+		DebugRendering->SetupText("SALUT C'EST COOL!");
+		DebugRendering->Execute();
 	}
 
 	return 0;
+}
+
+//#include "d3d12/D3D12Renderer.hpp"
+
+void D3D12Main()
+{
+	//D3D12Renderer renderer;
 }

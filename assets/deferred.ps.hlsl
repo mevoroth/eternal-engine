@@ -26,7 +26,7 @@ float4 PS( PSIn IN ) : SV_Target0
 	GfxBufferData.AmbientOcclusion = AmbientOcclusionTexture.Sample(DefaultSampler, IN.UV).xyz;
 
 	float3 FinalColor = LambertLighting(GfxBufferData.Normal, normalize(WorldPositionTexture.Sample(DefaultSampler, IN.UV) - 0), GfxBufferData.Diffuse, 0.5);
-
+	return float4(GfxBufferData.Diffuse, 1);
 	return float4(FinalColor, 1);
 	return float4(GfxBufferData.Normal, 1);
 	return float4(ComputeShading(GfxBufferData, 0, 0), 1);

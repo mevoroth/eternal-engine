@@ -54,7 +54,9 @@ namespace Eternal
 				_In_ const void* TextureData
 			);
 			~RenderingTask();
-			virtual void DoTask() override;
+			virtual void Setup() override;
+			virtual void Execute() override;
+			virtual bool TaskIsExecuted() override;
 
 			void SetMesh(Components::Mesh* MeshObj);
 			void SetRenderTargets(_In_ Graphics::RenderTarget** RenderTargets, _In_ uint32_t Count);
@@ -97,6 +99,7 @@ namespace Eternal
 			Types::Matrix4x4 _ViewMatrix;
 
 			Graphics::D3D11Texture* _Textures[SIZE_COUNT];
+			bool _Executed = false;
 		};
 	}
 }

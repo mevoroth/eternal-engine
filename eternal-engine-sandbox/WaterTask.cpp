@@ -55,7 +55,12 @@ WaterTask::~WaterTask()
 	delete _CameraConstant;
 }
 
-void WaterTask::DoTask()
+void WaterTask::Setup()
+{
+	_Executed = false;
+}
+
+void WaterTask::Execute()
 {
 	RenderTarget* CleanRenderTargets[] = {
 		nullptr
@@ -92,4 +97,11 @@ void WaterTask::DoTask()
 	_Context.UnbindShader<Context::PIXEL>();
 
 	_Context.UnbindConstant<Context::VERTEX>(0);
+
+	_Executed = true;
+}
+
+bool WaterTask::TaskIsExecuted()
+{
+	return _Executed;
 }

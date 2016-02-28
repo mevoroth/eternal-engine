@@ -78,6 +78,7 @@ mklink vase_plant_spec.tga ..\assets\vase_plant_spec.tga
 mklink vase_round.tga ..\assets\vase_round.tga
 mklink vase_round_ddn.tga ..\assets\vase_round_ddn.tga
 mklink vase_round_spec.tga ..\assets\vase_round_spec.tga
+mklink debugfont.tga ..\assets\debugfont.tga
 
 cd ..\x64\Debug
 
@@ -159,5 +160,8 @@ mklink vase_plant_spec.tga ..\..\assets\vase_plant_spec.tga
 mklink vase_round.tga ..\..\assets\vase_round.tga
 mklink vase_round_ddn.tga ..\..\assets\vase_round_ddn.tga
 mklink vase_round_spec.tga ..\..\assets\vase_round_spec.tga
+mklink debugfont.tga ..\..\assets\debugfont.tga
+
+cd ..\..\assets\
 
 pause
