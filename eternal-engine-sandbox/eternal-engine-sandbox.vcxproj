@@ -110,7 +110,7 @@
       <AdditionalLibraryDirectories>$(SolutionDir)$(Platform)\$(Configuration)\;C:\Program Files\Autodesk\FBX\FBX SDK\2015.1\lib\vs2013\x64\debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>
       </IgnoreSpecificDefaultLibraries>
-      <AdditionalDependencies>Xinput9_1_0.lib;Shlwapi.lib;d3d11.lib;d3d10.lib;eternal-engine-extern.lib;eternal-engine-core.lib;eternal-engine-components.lib;eternal-engine-graphics.lib;eternal-engine-utils.lib;libfbxsdk.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>Xinput9_1_0.lib;Shlwapi.lib;d3d12.lib;d3d11.lib;d3d10.lib;DXGI.lib;eternal-engine-extern.lib;eternal-engine-core.lib;eternal-engine-components.lib;eternal-engine-graphics.lib;eternal-engine-utils.lib;libfbxsdk.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalOptions>/verbose %(AdditionalOptions)</AdditionalOptions>
     </Link>
   </ItemDefinitionGroup>

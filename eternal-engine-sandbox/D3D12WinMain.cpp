@@ -1,5 +1,6 @@
 #include "Macros/Macros.hpp"
 
+#include "Types/Types.hpp"
 #include "WindowsProcess.hpp"
 #include "Window/Window.hpp"
 #include "Input/WinInput/WinInput.hpp"
@@ -12,12 +13,20 @@
 #include "d3d12/D3D12BlendState.hpp"
 #include "d3d12/D3D12RenderTarget.hpp"
 #include "d3d12/D3D12CommandList.hpp"
+#include "d3d12/D3D12Constant.hpp"
 #include "Graphics/DepthTest.hpp"
 #include "Graphics/StencilTest.hpp"
 #include "Graphics/Viewport.hpp"
 
 using namespace Eternal::Graphics;
 using namespace Eternal::Input;
+using namespace Eternal::Types;
+
+struct DebugTextParameters
+{
+	Vector4 PositionScreenSize;
+	Vector2 FontTableSize;
+};
 
 void WINAPI D3D12WinMain(HINSTANCE hInstance,
 	HINSTANCE hPrevInstance,
@@ -54,9 +63,11 @@ void WINAPI D3D12WinMain(HINSTANCE hInstance,
 	D3D12State State(DeviceObj, InputLayout, VS, PS, DepthTestObj, StencilTestObj, BlendStates, RenderTargets, ETERNAL_ARRAYSIZE(RenderTargets));
 	Viewport ViewportObj(0, 0, 640, 480);
 
+	D3D12Constant DebugTextParametersConstant(DeviceObj, sizeof(DebugTextParameters));
 	D3D12CommandList CommandList(DeviceObj, DirectCommandQueue, State);
 
 	CommandList.SetViewport(ViewportObj);
 	CommandList.SetScissorRectangle(ViewportObj);
+	CommandList.BindConstant(0, DebugTextParametersConstant);
 	CommandList.DrawPrimitive(6);
 }
