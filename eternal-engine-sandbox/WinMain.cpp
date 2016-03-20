@@ -181,15 +181,15 @@ int WINAPI WinMain(HINSTANCE hInstance,
 		WinInputObj->Update();
 		XInputObj->Update();
 
-		//CameraTransform.Transform.Rotate(Vector3(
-		//	0.f,
-		//	Input::Get()->GetAxis(Input::JOY0_RX) * 0.01f,
-		//	0.f
-		//));
+		CameraTransform.Transform.Rotate(Vector3(
+			0.f,
+			Input::Get()->GetAxis(Input::JOY0_RX) * 0.01f,
+			0.f
+		));
 
-		//Vector3 Forward = CameraTransform.Transform.GetForward();
-		//Vector3 Right = CameraTransform.Transform.GetRight();
-		//Vector3 Up = ParentTransform.Transform.GetUp();
+		Vector3 Forward = CameraTransform.Transform.GetForward();
+		Vector3 Right = CameraTransform.Transform.GetRight();
+		Vector3 Up = ParentTransform.Transform.GetUp();
 
 		//CameraTransform.Translate(Input::Get()->GetAxis(Input::JOY0_LX) * 1.f * Right - Input::Get()->GetAxis(Input::JOY0_LY) * 1.f * Forward);
 		//ParentTransform.Transform.Translate(/*Vector3(
@@ -197,7 +197,7 @@ int WINAPI WinMain(HINSTANCE hInstance,
 		//	-Input::Get()->GetAxis(Input::JOY0_RY) * 1.f,
 		//	-Input::Get()->GetAxis(Input::JOY0_LY) * 1.f
 		//)*/);
-		//ParentTransform.Transform.Translate(Input::Get()->GetAxis(Input::JOY0_LX) * Right - Input::Get()->GetAxis(Input::JOY0_RY) * Up - Input::Get()->GetAxis(Input::JOY0_LY) * Forward);
+		ParentTransform.Transform.Translate(Input::Get()->GetAxis(Input::JOY0_LX) * Right - Input::Get()->GetAxis(Input::JOY0_RY) * Up - Input::Get()->GetAxis(Input::JOY0_LY) * Forward);
 
 		//WaterRendering = new Eternal::Sandbox::WaterTask(RendererObj, *RendererObj.GetMainContext());
 		//WaterRendering->SetCamera(&CameraObj);
@@ -231,8 +231,11 @@ int WINAPI WinMain(HINSTANCE hInstance,
 		//Rendering->Execute();
 		////delete Rendering;
 		
+		Matrix4x4 ViewMat = ParentTransform.Transform.GetModelMatrix() * CameraTransform.Transform.GetModelMatrix();
+		//ViewMat.m[0][]
 		DebugRendering->Setup();
-		DebugRendering->SetupText("SALUT C'EST COOL!");
+		//DebugRendering->SetupText(std::string("Camera Position : (") + to_string(ViewMat._41) + std::string(", ") + to_string(ViewMat._42) + std::string(", ") + to_string(ViewMat._43) + std::string(")") /*+ ")"*/);
+		DebugRendering->SetupText("abcdefghijklmnopqrstuvwxyz");
 		DebugRendering->Execute();
 	}
 

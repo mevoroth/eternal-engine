@@ -143,6 +143,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="D3D12WinMain.cpp" />
     <ClCompile Include="DebugTextTask.cpp" />
     <ClCompile Include="FakeTask.cpp" />
     <ClCompile Include="RenderingTask.cpp" />

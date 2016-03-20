@@ -36,6 +36,9 @@
     <ClCompile Include="DebugTextTask.cpp">
       <Filter>Fichiers sources</Filter>
     </ClCompile>
+    <ClCompile Include="D3D12WinMain.cpp">
+      <Filter>Fichiers sources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="..\assets\debug.gs.hlsl">
