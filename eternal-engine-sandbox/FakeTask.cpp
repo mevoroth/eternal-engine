@@ -14,11 +14,6 @@ FakeTask::~FakeTask()
 	delete _State;
 }
 
-bool FakeTask::TaskIsExecuted()
-{
-	return _State->Load() == 1;
-}
-
 void FakeTask::Setup()
 {
 	_State->Store(0);

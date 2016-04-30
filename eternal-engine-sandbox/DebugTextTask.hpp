@@ -36,9 +36,9 @@ namespace Eternal
 			DebugTextTask(Renderer& RendererObj, Context& ContextObj);
 			virtual ~DebugTextTask();
 
-			virtual bool TaskIsExecuted() override;
 			virtual void Setup() override;
 			virtual void Execute() override;
+			virtual void Reset() override;
 
 			void SetupText(const std::string& Text);
 

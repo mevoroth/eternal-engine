@@ -56,7 +56,7 @@ namespace Eternal
 			~RenderingTask();
 			virtual void Setup() override;
 			virtual void Execute() override;
-			virtual bool TaskIsExecuted() override;
+			virtual void Reset() override {};
 
 			void SetMesh(Components::Mesh* MeshObj);
 			void SetRenderTargets(_In_ Graphics::RenderTarget** RenderTargets, _In_ uint32_t Count);

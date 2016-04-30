@@ -40,7 +40,7 @@ namespace Eternal
 
 			virtual void Setup() override;
 			virtual void Execute() override;
-			virtual bool TaskIsExecuted() override;
+			virtual void Reset() override {};
 			void SetCamera(Camera* CameraObj)
 			{
 				_Camera = CameraObj;

@@ -55,6 +55,8 @@ DebugTextTask::~DebugTextTask()
 
 void DebugTextTask::Execute()
 {
+	SetState(Task::EXECUTING);
+
 	RenderTarget* BackBuffer = static_cast<D3D11Renderer*>(Renderer::Get())->GetBackBuffer();
 	RenderTarget* NullRenderTarget = nullptr;
 
@@ -83,20 +85,25 @@ void DebugTextTask::Execute()
 	_Context.UnbindShader<Context::VERTEX>();
 	_Context.UnbindShader<Context::PIXEL>();
 
-	_Executed = true;
-}
-
-bool DebugTextTask::TaskIsExecuted()
-{
-	return _Executed;
+	SetState(DONE);
 }
 
 void DebugTextTask::Setup()
 {
-	_Executed = false;
+	SetState(SETTINGUP);
+
+	SetupText("abcdefghijklmn");
+
+	SetState(SETUP);
 }
 
 void DebugTextTask::SetupText(const std::string& Text)
 {
 	_Text = Text;
+}
+
+void DebugTextTask::Reset()
+{
+	ETERNAL_ASSERT(GetState() == DONE);
+	SetState(IDLE);
 }

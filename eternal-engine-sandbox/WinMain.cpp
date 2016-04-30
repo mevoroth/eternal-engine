@@ -173,7 +173,11 @@ int WINAPI WinMain(HINSTANCE hInstance,
 	//CameraTransform.Transform.Rotate(Vector3(0.f, 0.f, 45.f * 3.1415f / 180.f));
 
 	Rendering = new Eternal::Sandbox::RenderingTask(RendererObj, *RendererObj.GetMainContext(), &CameraObj, Lights, Content);
+	Rendering->SetTaskName("Rendering Task");
 	DebugRendering = new Eternal::Sandbox::DebugTextTask(RendererObj, *RendererObj.GetMainContext());
+	DebugRendering->SetTaskName("Debug Rendering");
+
+	TaskManagerObj.GetTaskScheduler().PushTask(DebugRendering);
 
 	for (;;)
 	{
@@ -231,12 +235,16 @@ int WINAPI WinMain(HINSTANCE hInstance,
 		//Rendering->Execute();
 		////delete Rendering;
 		
-		Matrix4x4 ViewMat = ParentTransform.Transform.GetModelMatrix() * CameraTransform.Transform.GetModelMatrix();
-		//ViewMat.m[0][]
-		DebugRendering->Setup();
-		//DebugRendering->SetupText(std::string("Camera Position : (") + to_string(ViewMat._41) + std::string(", ") + to_string(ViewMat._42) + std::string(", ") + to_string(ViewMat._43) + std::string(")") /*+ ")"*/);
-		DebugRendering->SetupText("abcdefghijklmnopqrstuvwxyz");
-		DebugRendering->Execute();
+		//Matrix4x4 ViewMat = ParentTransform.Transform.GetModelMatrix() * CameraTransform.Transform.GetModelMatrix();
+		////ViewMat.m[0][]
+		//DebugRendering->Setup();
+		////DebugRendering->SetupText(std::string("Camera Position : (") + to_string(ViewMat._41) + std::string(", ") + to_string(ViewMat._42) + std::string(", ") + to_string(ViewMat._43) + std::string(")") /*+ ")"*/);
+		//DebugRendering->SetupText("abcdefghijklmnopqrstuvwxyz");
+		//DebugRendering->Execute();
+
+		TaskManagerObj.Schedule();
+		TaskManagerObj.Barrier();
+		TaskManagerObj.GetTaskScheduler().Reset();
 	}
 
 	return 0;

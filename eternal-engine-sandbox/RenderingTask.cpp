@@ -226,11 +226,6 @@ void RenderingTask::Execute()
 	_Executed = true;
 }
 
-bool RenderingTask::TaskIsExecuted()
-{
-	return _Executed;
-}
-
 void RenderingTask::SetRenderTargets(_In_ Graphics::RenderTarget** RenderTargets, _In_ uint32_t Count)
 {
 	_RTs = RenderTargets;

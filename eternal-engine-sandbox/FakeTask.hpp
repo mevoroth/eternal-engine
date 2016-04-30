@@ -19,9 +19,9 @@ public:
 	FakeTask();
 	~FakeTask();
 
-	virtual bool TaskIsExecuted() override;
 	virtual void Setup() override;
 	virtual void Execute() override;
+	virtual void Reset() override {};
 
 private:
 	AtomicInt* _State = nullptr;

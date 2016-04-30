@@ -100,8 +100,3 @@ void WaterTask::Execute()
 
 	_Executed = true;
 }
-
-bool WaterTask::TaskIsExecuted()
-{
-	return _Executed;
-}
