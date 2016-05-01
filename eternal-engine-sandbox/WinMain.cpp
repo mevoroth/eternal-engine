@@ -43,6 +43,7 @@
 #include "RenderingTask.hpp"
 #include "WaterTask.hpp"
 #include "DebugTextTask.hpp"
+#include "FakeTask.hpp"
 #include "Camera/PerspectiveCamera.hpp"
 #include "Camera/OrthographicCamera.hpp"
 #include "Light/Light.hpp"
@@ -167,6 +168,8 @@ int WINAPI WinMain(HINSTANCE hInstance,
 	Eternal::Sandbox::WaterTask* WaterRendering = nullptr;
 	Eternal::Sandbox::DebugTextTask* DebugRendering = nullptr;
 
+	FakeTask* FakeTaskObj = nullptr;
+
 	ParentTransform.Transform.SetTranslation(Vector3(0.f, -100.f, 0.f));
 	CameraTransform.Transform.Rotate(Vector3(0.f, 0.f, 0.f));
 	//CameraTransform.Transform.Rotate(Vector3(0.f, 45.f * 3.1415f / 180.f, 0.f));
@@ -176,8 +179,17 @@ int WINAPI WinMain(HINSTANCE hInstance,
 	Rendering->SetTaskName("Rendering Task");
 	DebugRendering = new Eternal::Sandbox::DebugTextTask(RendererObj, *RendererObj.GetMainContext());
 	DebugRendering->SetTaskName("Debug Rendering");
+	FakeTaskObj = new FakeTask();
+	FakeTaskObj->SetTaskName("Fake Task");
 
-	TaskManagerObj.GetTaskScheduler().PushTask(DebugRendering);
+	Rendering->SetMesh(&MeshObj);
+	Rendering->SetDeferredQuad(&Plane);
+	Rendering->SetRenderTargets((RenderTarget**)&RenderTargets, ETERNAL_ARRAYSIZE(RenderTargets));
+	Rendering->SetBackBufferRenderTarget(RendererObj.GetBackBuffer());
+
+	TaskManagerObj.GetTaskScheduler().PushTask(Rendering);
+	TaskManagerObj.GetTaskScheduler().PushTask(DebugRendering, Rendering);
+	TaskManagerObj.GetTaskScheduler().PushTask(FakeTaskObj);
 
 	for (;;)
 	{
@@ -222,7 +234,7 @@ int WINAPI WinMain(HINSTANCE hInstance,
 
 		//Eternal::Sandbox::RenderingTask* PreviousRendering = Rendering;
 		////Rendering = new Eternal::Sandbox::RenderingTask(RendererObj, *RendererObj.GetMainContext(), &CameraObj, Lights, Content);
-		//Rendering->SetViewMatrix(ParentTransform.Transform.GetModelMatrix() * CameraTransform.Transform.GetModelMatrix());
+		Rendering->SetViewMatrix(ParentTransform.Transform.GetModelMatrix() * CameraTransform.Transform.GetModelMatrix());
 		////Rendering->SetMesh(&Plane);
 		//Rendering->SetMesh(&MeshObj);
 		//Rendering->SetDeferredQuad(&Plane);

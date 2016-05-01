@@ -113,11 +113,12 @@ RenderingTask::~RenderingTask()
 
 void RenderingTask::Setup()
 {
-	_Executed = false;
+	SetState(SETUP);
 }
 
 void RenderingTask::Execute()
 {
+	SetState(EXECUTING);
 	Graphics::RenderTarget* RenderTargets[] = {
 		nullptr,
 		nullptr,
@@ -223,7 +224,7 @@ void RenderingTask::Execute()
 	static_cast<Graphics::D3D11Context&>(_Context).GetD3D11Context()->Flush();
 
 	OutputDebugString("RENDERED\n");
-	_Executed = true;
+	SetState(DONE);
 }
 
 void RenderingTask::SetRenderTargets(_In_ Graphics::RenderTarget** RenderTargets, _In_ uint32_t Count)
@@ -294,3 +295,7 @@ void RenderingTask::_Draw(_In_ Components::Mesh* MeshObj)
 	}
 }
 
+void RenderingTask::Reset()
+{
+	SetState(IDLE);
+}

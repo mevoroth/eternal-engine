@@ -21,7 +21,7 @@ public:
 
 	virtual void Setup() override;
 	virtual void Execute() override;
-	virtual void Reset() override {};
+	virtual void Reset() override;
 
 private:
 	AtomicInt* _State = nullptr;
