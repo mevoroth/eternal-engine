@@ -11,6 +11,7 @@ struct GfxBuffer
 	float3 Emissive;
 	float3 Normal;
 	float3 AmbientOcclusion;
+	float3 Position;
 };
 
 struct LightBuffer
@@ -49,19 +50,36 @@ float3 Fresnel(float3 SpecularColor, float VdotH)
 	return 0.5f * Square((g - VdotH) / (g + VdotH)) * (1.f + Square(((g + VdotH)*VdotH - 1.f) / ((g - VdotH)*VdotH + 1.f)));
 }
 
-float3 ComputeShading(GfxBuffer GfxBufferData, float3 Light, float3 View)
+float3 Lambert(GfxBuffer GfxBufferData, float4 Light, float3 View)
 {
-	float3 Half = normalize(View + Light);
-	float NdotL = saturate(dot(GfxBufferData.Normal, Light));
-	float NdotH = saturate(dot(GfxBufferData.Normal, Half));
-	float VdotH = saturate(dot(View, Half));
-	float NdotV = saturate(dot(GfxBufferData.Normal, View));
+	float3 LightVector = normalize(Light.xyz - GfxBufferData.Position.xyz);
+	float3 Normal = GfxBufferData.Normal;
+	float NdotL = saturate(dot(Normal, -LightVector));
 
-	float Distrib = Distribution(GfxBufferData.MetallicSpecularRoughness.z, NdotH);
-	float Visibility = GeometryVisibility(GfxBufferData.MetallicSpecularRoughness.z, NdotV, NdotL);
+	//float3 DiffuseColor = Diffuse(GfxBufferData.Diffuse);
+	float3 DiffuseColor = GfxBufferData.Diffuse;
+	float Radiance = saturate(Light.w * NdotL);
+
+	//return LightVector;
+	//return NdotL;
+	//return Normal;
+	return DiffuseColor * Radiance;
+}
+
+float3 ComputeShading(GfxBuffer GfxBufferData, float4 Light, float3 View)
+{
+	//float3 Half = normalize(View + Light);
+	//float NdotL = saturate(dot(GfxBufferData.Normal, Light));
+	//float NdotH = saturate(dot(GfxBufferData.Normal, Half));
+	//float VdotH = saturate(dot(View, Half));
+	//float NdotV = saturate(dot(GfxBufferData.Normal, View));
+
+	//float Distrib = Distribution(GfxBufferData.MetallicSpecularRoughness.z, NdotH);
+	//float Visibility = GeometryVisibility(GfxBufferData.MetallicSpecularRoughness.z, NdotV, NdotL);
 	//float Fresnel = Fresnel(GfxBufferData.Specular)
 
-	return Diffuse(GfxBufferData.Diffuse) + Distrib * Visibility;
+	return Lambert(GfxBufferData, Light, View);
+	//return Diffuse(GfxBufferData.Diffuse)/* + Distrib * Visibility*/;
 }
 
 #endif

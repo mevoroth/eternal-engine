@@ -84,7 +84,7 @@ namespace Eternal
 
 			Graphics::Sampler* _StandardSampler = nullptr;
 
-			//Graphics::Constant* _LightsConstants = nullptr;
+			Graphics::Constant* _LightsConstants = nullptr;
 			Graphics::Constant* _CameraConstant = nullptr;
 			Graphics::Constant* _ModelConstant = nullptr;
 

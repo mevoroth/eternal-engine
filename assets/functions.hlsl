@@ -8,19 +8,12 @@ float Square(float Value)
 
 float2 Square(float2 Value)
 {
-	return float2(
-		Value.x*Value.x,
-		Value.y*Value.y
-	);
+	return Value*Value;
 }
 
 float3 Square(float3 Value)
 {
-	return float3(
-		Value.x*Value.x,
-		Value.y*Value.y,
-		Value.z*Value.z
-	);
+	return Value*Value;
 }
 
 #endif

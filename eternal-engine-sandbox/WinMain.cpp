@@ -116,10 +116,10 @@ int WINAPI WinMain(HINSTANCE hInstance,
 
 	GenericMesh<D3D11PosUVVertexBuffer::PosUVVertex, D3D11PosUVVertexBuffer, D3D11UInt32IndexBuffer> Plane;
 	D3D11PosUVVertexBuffer::PosUVVertex PlaneVertices[] = {
-		{ Vector4(-1000.f, -1000.f, 0.f, 1.f), Vector2(0.f, 0.f) },
-		{ Vector4(-1000.f,  1000.f, 0.f, 1.f), Vector2(0.f, 1.f) },
-		{ Vector4( 1000.f,  1000.f, 0.f, 1.f), Vector2(1.f, 1.f) },
-		{ Vector4( 1000.f, -1000.f, 0.f, 1.f), Vector2(1.f, 0.f) }
+		{ Vector4(-1.f, -1.f, 0.f, 1.f), Vector2(0.f, 0.f) },
+		{ Vector4(-1.f,  1.f, 0.f, 1.f), Vector2(0.f, 1.f) },
+		{ Vector4( 1.f,  1.f, 0.f, 1.f), Vector2(1.f, 1.f) },
+		{ Vector4( 1.f, -1.f, 0.f, 1.f), Vector2(1.f, 0.f) }
 	};
 	for (uint32_t VertexIndex = 0; VertexIndex < ETERNAL_ARRAYSIZE(PlaneVertices); ++VertexIndex)
 	{
@@ -199,7 +199,7 @@ int WINAPI WinMain(HINSTANCE hInstance,
 
 		CameraTransform.Transform.Rotate(Vector3(
 			0.f,
-			Input::Get()->GetAxis(Input::JOY0_RX) * 0.01f,
+			Input::Get()->GetAxis(Input::JOY0_RX) * 0.1f,
 			0.f
 		));
 
@@ -213,7 +213,7 @@ int WINAPI WinMain(HINSTANCE hInstance,
 		//	-Input::Get()->GetAxis(Input::JOY0_RY) * 1.f,
 		//	-Input::Get()->GetAxis(Input::JOY0_LY) * 1.f
 		//)*/);
-		ParentTransform.Transform.Translate(Input::Get()->GetAxis(Input::JOY0_LX) * Right - Input::Get()->GetAxis(Input::JOY0_RY) * Up - Input::Get()->GetAxis(Input::JOY0_LY) * Forward);
+		ParentTransform.Transform.Translate(Input::Get()->GetAxis(Input::JOY0_LX) * 10.f * Right - Input::Get()->GetAxis(Input::JOY0_RY) * 10.f * Up - Input::Get()->GetAxis(Input::JOY0_LY) * 10.f * Forward);
 
 		//WaterRendering = new Eternal::Sandbox::WaterTask(RendererObj, *RendererObj.GetMainContext());
 		//WaterRendering->SetCamera(&CameraObj);

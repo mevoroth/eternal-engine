@@ -57,7 +57,7 @@ RenderingTask::RenderingTask(
 	_DeferredVS = Graphics::ShaderFactory::Get()->CreateVertexShader("Deferred", "deferred.vs.hlsl", PostProcessDataType, ETERNAL_ARRAYSIZE(PostProcessDataType));
 	_DeferredPS = Graphics::ShaderFactory::Get()->CreatePixelShader("Deferred", "deferred.ps.hlsl");
 	
-	//_LightsConstants = new Graphics::D3D11Constant(sizeof(Components::Light) * 8, Graphics::D3D11Resource::IMMUTABLE, Graphics::D3D11Resource::NONE, (void*)&Lights[0]);
+	_LightsConstants = new Graphics::D3D11Constant(sizeof(Components::Light) * 8, Graphics::D3D11Resource::IMMUTABLE, Graphics::D3D11Resource::NONE, (void*)&Lights[0]);
 	Types::Matrix4x4 CameraMatrix;
 	CameraObj->GetProjectionMatrix(CameraMatrix);
 	_CameraConstant = new Graphics::D3D11Constant(sizeof(Types::Matrix4x4) * 2, Graphics::D3D11Resource::DYNAMIC, Graphics::D3D11Resource::WRITE, (void*)&CameraMatrix);
@@ -88,8 +88,8 @@ RenderingTask::RenderingTask(
 RenderingTask::~RenderingTask()
 {
 	OutputDebugString("ENDING RENDERING\n");
-	//delete _LightsConstants;
-	//_LightsConstants = nullptr;
+	delete _LightsConstants;
+	_LightsConstants = nullptr;
 	delete _CameraConstant;
 	_CameraConstant = nullptr;
 	delete _ModelConstant;
@@ -200,16 +200,20 @@ void RenderingTask::Execute()
 	_Context.BindBuffer<Graphics::Context::PIXEL>(4, (Graphics::D3D11RenderTarget*)_RTs[4]);
 	_Context.BindBuffer<Graphics::Context::PIXEL>(5, (Graphics::D3D11RenderTarget*)_RTs[5]);
 
+	_Context.BindConstant<Graphics::Context::PIXEL>(0, _LightsConstants);
+
 	_Context.BindSampler<Graphics::Context::PIXEL>(0, _StandardSampler);
 
 	_Context.SetRenderTargets(&_BackBuffer, 1);
 
 	_Context.DrawIndexed(_DeferredQuad->GetVertexBuffer(), _DeferredQuad->GetIndexBuffer());
-	static_cast<Graphics::D3D11Renderer*>(Graphics::Renderer::Get())->Flush();
+	//static_cast<Graphics::D3D11Renderer*>(Graphics::Renderer::Get())->Flush();
 
 	_Context.SetRenderTargets(RenderTargets, ETERNAL_ARRAYSIZE(RenderTargets));
 
 	_Context.UnbindSampler<Graphics::Context::PIXEL>(0);
+
+	_Context.UnbindConstant<Graphics::Context::PIXEL>(0);
 
 	_Context.UnbindBuffer<Graphics::Context::PIXEL>(0);
 	_Context.UnbindBuffer<Graphics::Context::PIXEL>(1);
