@@ -17,7 +17,7 @@ class FakeTask : public Task
 {
 public:
 	FakeTask();
-	~FakeTask();
+	virtual ~FakeTask() override;
 
 	virtual void Setup() override;
 	virtual void Execute() override;

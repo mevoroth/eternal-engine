@@ -120,6 +120,42 @@ LRESULT WindowsProcess::WindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARA
 		EndPaint(hWnd, &PaintStruct);
 	} break;
 
+	case WM_LBUTTONDOWN:
+	{
+		_InputHandler->NotifyKeyPressed(Input::MOUSE0);
+	} break;
+
+	case WM_LBUTTONUP:
+	{
+		_InputHandler->NotifyKeyReleased(Input::MOUSE0);
+	} break;
+
+	case WM_RBUTTONDOWN:
+	{
+		_InputHandler->NotifyKeyPressed(Input::MOUSE1);
+	} break;
+
+	case WM_RBUTTONUP:
+	{
+		_InputHandler->NotifyKeyReleased(Input::MOUSE1);
+	} break;
+
+	case WM_MBUTTONDOWN:
+	{
+		_InputHandler->NotifyKeyPressed(Input::MOUSE2);
+	} break;
+
+	case WM_MBUTTONUP:
+	{
+		_InputHandler->NotifyKeyReleased(Input::MOUSE2);
+	} break;
+
+	case WM_MOUSEMOVE:
+	{
+		_InputHandler->NotifyAxis(Input::MOUSE_X, (float)(lParam & 0xFFFF));
+		_InputHandler->NotifyAxis(Input::MOUSE_Y, (float)(lParam >> 16));
+	} break;
+
 	case WM_KEYDOWN:
 	{
 		_InputHandler->NotifyKeyPressed(_KeyMapping[wParam]);

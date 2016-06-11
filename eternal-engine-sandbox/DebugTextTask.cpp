@@ -41,7 +41,7 @@ DebugTextTask::DebugTextTask(Renderer& RendererObj, Context& ContextObj)
 	_Texture = TextureFactory::Get()->GetTexture("debugfont.tga");
 
 	DebugTextParameters Parameters;
-	Parameters.PositionScreenSize = Vector4(5.f, 5.f, 640.f, 480.f);
+	Parameters.PositionScreenSize = Vector4(5.f, 5.f, Device::WIDTH, Device::HEIGHT);
 	Parameters.FontTableSize = Vector4(80.f, 55.f, 0.f, 0.f);
 
 	_DebugTextConstant = new D3D11Constant(sizeof(DebugTextParameters), D3D11Resource::DEFAULT, Resource::NONE, &Parameters);
@@ -76,7 +76,6 @@ void DebugTextTask::Execute()
 	_Context.BindBuffer<Context::VERTEX>(1, (D3D11StructuredBuffer*)_StringBuffer);
 	_Context.SetRenderTargets(&BackBuffer, 1);
 	_Context.DrawPrimitive(6*_Text.length());
-	static_cast<Graphics::D3D11Renderer*>(Graphics::Renderer::Get())->Flush();
 	_Context.SetRenderTargets(&NullRenderTarget, 1);
 	_Context.UnbindSampler<Context::PIXEL>(0);
 	_Context.UnbindConstant<Context::VERTEX>(0);

@@ -6,6 +6,7 @@
 #include "Graphics/RenderTarget.hpp"
 #include "Graphics/DepthTest.hpp"
 #include "Graphics/StencilTest.hpp"
+#include "Graphics/Device.hpp"
 
 #include "Camera/Camera.hpp"
 #include "Mesh/GenericMesh.hpp"
@@ -37,9 +38,9 @@ WaterTask::WaterTask(Renderer& RendererObj, Context& ContextObj)
 	_CameraConstant = new D3D11Constant(sizeof(Types::Matrix4x4) * 2, Graphics::D3D11Resource::DYNAMIC, Graphics::D3D11Resource::WRITE);
 
 	//_BackBuffer = RendererObj.GetBackBuffer();
-	_BackBuffer = new D3D11RenderTarget(640, 480);
+	_BackBuffer = new D3D11RenderTarget(Graphics::Device::WIDTH, Graphics::Device::HEIGHT);
 
-	_Viewport = new D3D11Viewport(0, 0, 640, 480);
+	_Viewport = new D3D11Viewport(0, 0, Graphics::Device::WIDTH, Graphics::Device::HEIGHT);
 
 	_BlendState = new Graphics::D3D11BlendState(Graphics::BlendState::SRC_ALPHA, Graphics::BlendState::INV_SRC_ALPHA, Graphics::BlendState::OP_ADD,
 		Graphics::BlendState::SRC_ALPHA, Graphics::BlendState::INV_SRC_ALPHA, Graphics::BlendState::OP_ADD);
@@ -47,7 +48,7 @@ WaterTask::WaterTask(Renderer& RendererObj, Context& ContextObj)
 		Graphics::DepthTest(Graphics::DepthTest::ALL, Graphics::Comparison::LESS),
 		Graphics::StencilTest()
 	);
-	_DepthStencilBuffer = new Graphics::D3D11DepthStencilBuffer(640, 480);
+	_DepthStencilBuffer = new Graphics::D3D11DepthStencilBuffer(Graphics::Device::WIDTH, Graphics::Device::HEIGHT);
 }
 
 WaterTask::~WaterTask()

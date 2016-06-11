@@ -2,6 +2,9 @@
 #define _WINDOWS_PROCESS_HPP_
 
 #include <cstdint>
+#define WIN32_EXTRA_LEAN
+#define WIN32_LEAN_AND_MEAN
+#define VC_EXTRALEAN
 #include <Windows.h>
 #include "Input/Input.hpp"
 

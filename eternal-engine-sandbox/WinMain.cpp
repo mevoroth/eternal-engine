@@ -1,3 +1,6 @@
+#define WIN32_LEAN_AND_MEAN
+#define WIN32_EXTRA_LEAN
+#define VC_EXTRALEAN
 #include <Windows.h>
 
 #include "d3d11/D3D11Device.hpp"
@@ -53,6 +56,9 @@
 #include "d3d11/D3D11DepthStencilBuffer.hpp"
 #include "Core/TransformComponent.hpp"
 #include "WindowsProcess.hpp"
+#include "Task/ImguiBeginTask.hpp"
+#include "Task/ImguiEndTask.hpp"
+#include "Task/ControlsTask.hpp"
 
 #include "Import/tga/ImportTga.hpp"
 #include "Resources/TextureFactory.hpp"
@@ -62,6 +68,7 @@ using namespace Eternal::Import;
 using namespace Eternal::Input;
 using namespace Eternal::Components;
 using namespace Eternal::Types;
+using namespace Eternal::Task;
 //void DrawMeshes(D3D11Renderer* renderer, const Mesh* mesh);
 
 void D3D12Main();
@@ -149,26 +156,28 @@ int WINAPI WinMain(HINSTANCE hInstance,
 	Lights.push_back(Light(Vector3(std::numeric_limits<float>::quiet_NaN(), std::numeric_limits<float>::quiet_NaN(), std::numeric_limits<float>::quiet_NaN()), 1.f));
 	Lights.push_back(Light(Vector3(std::numeric_limits<float>::quiet_NaN(), std::numeric_limits<float>::quiet_NaN(), std::numeric_limits<float>::quiet_NaN()), 1.f));
 
-	D3D11DepthStencilBuffer DepthStencilBuffers(640, 480);
+	D3D11DepthStencilBuffer DepthStencilBuffers(Device::WIDTH, Device::HEIGHT);
 
 	D3D11RenderTarget* RenderTargets[] = {
-		new D3D11RenderTarget(640, 480),
-		new D3D11RenderTarget(640, 480),
-		new D3D11RenderTarget(640, 480),
-		new D3D11RenderTarget(640, 480),
-		new D3D11RenderTarget(640, 480),
-		new D3D11RenderTarget(640, 480)
+		new D3D11RenderTarget(Device::WIDTH, Device::HEIGHT),
+		new D3D11RenderTarget(Device::WIDTH, Device::HEIGHT),
+		new D3D11RenderTarget(Device::WIDTH, Device::HEIGHT),
+		new D3D11RenderTarget(Device::WIDTH, Device::HEIGHT),
+		new D3D11RenderTarget(Device::WIDTH, Device::HEIGHT),
+		new D3D11RenderTarget(Device::WIDTH, Device::HEIGHT)
 	};
 
 	Eternal::Core::TransformComponent ParentTransform;
 	Eternal::Core::TransformComponent CameraTransform;
 	CameraTransform.AttachTo(&ParentTransform);
-	Eternal::Sandbox::RenderingTask* Rendering = nullptr;
 
+	Eternal::Sandbox::RenderingTask* Rendering = nullptr;
 	Eternal::Sandbox::WaterTask* WaterRendering = nullptr;
 	Eternal::Sandbox::DebugTextTask* DebugRendering = nullptr;
-
 	FakeTask* FakeTaskObj = nullptr;
+	ImguiBeginTask* ImguiBeginTaskObj = nullptr;
+	ImguiEndTask* ImguiEndTaskObj = nullptr;
+	ControlsTask* ControlsTaskObj = nullptr;
 
 	ParentTransform.Transform.SetTranslation(Vector3(0.f, -100.f, 0.f));
 	CameraTransform.Transform.Rotate(Vector3(0.f, 0.f, 0.f));
@@ -181,21 +190,33 @@ int WINAPI WinMain(HINSTANCE hInstance,
 	DebugRendering->SetTaskName("Debug Rendering");
 	FakeTaskObj = new FakeTask();
 	FakeTaskObj->SetTaskName("Fake Task");
+	ImguiBeginTaskObj = new ImguiBeginTask(DeviceObj.GetWindow(), Device::WIDTH, Device::HEIGHT);
+	ImguiBeginTaskObj->SetupKeyboard(WinInputObj);
+	ImguiEndTaskObj = new ImguiEndTask(*RendererObj.GetMainContext());
+	ControlsTaskObj = new ControlsTask();
+	ControlsTaskObj->RegisterInput(XInputObj);
+	ControlsTaskObj->RegisterInput(WinInputObj);
 
 	Rendering->SetMesh(&MeshObj);
 	Rendering->SetDeferredQuad(&Plane);
 	Rendering->SetRenderTargets((RenderTarget**)&RenderTargets, ETERNAL_ARRAYSIZE(RenderTargets));
 	Rendering->SetBackBufferRenderTarget(RendererObj.GetBackBuffer());
 
-	TaskManagerObj.GetTaskScheduler().PushTask(Rendering);
+	ImguiEndTaskObj->SetRenderTarget(RendererObj.GetBackBuffer());
+
+	TaskManagerObj.GetTaskScheduler().PushTask(ControlsTaskObj);
+	TaskManagerObj.GetTaskScheduler().PushTask(ImguiBeginTaskObj, ControlsTaskObj);
+	TaskManagerObj.GetTaskScheduler().PushTask(Rendering, ImguiBeginTaskObj);
 	TaskManagerObj.GetTaskScheduler().PushTask(DebugRendering, Rendering);
 	TaskManagerObj.GetTaskScheduler().PushTask(FakeTaskObj);
+	{
+		TaskManagerObj.GetTaskScheduler().PushTask(ImguiEndTaskObj, DebugRendering);
+		TaskManagerObj.GetTaskScheduler().PushTask(ImguiEndTaskObj, FakeTaskObj);
+	}
 
 	for (;;)
 	{
 		WindowsProcess::ExecuteMessageLoop();
-		WinInputObj->Update();
-		XInputObj->Update();
 
 		CameraTransform.Transform.Rotate(Vector3(
 			0.f,

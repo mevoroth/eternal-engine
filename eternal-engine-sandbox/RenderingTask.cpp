@@ -3,6 +3,7 @@
 #include <cmath>
 
 #include "Macros/Macros.hpp"
+#include "Graphics/Device.hpp"
 #include "Graphics/ShaderFactory.hpp"
 #include "Graphics/Context.hpp"
 #include "d3d11/D3D11Constant.hpp"
@@ -65,12 +66,12 @@ RenderingTask::RenderingTask(
 	_StandardSampler = new Graphics::D3D11Sampler(true, true, false, false, Graphics::Sampler::WRAP, Graphics::Sampler::WRAP, Graphics::Sampler::WRAP);
 	_BlendState = new Graphics::D3D11BlendState(Graphics::BlendState::SRC_ALPHA, Graphics::BlendState::INV_SRC_ALPHA, Graphics::BlendState::OP_ADD,
 		Graphics::BlendState::SRC_ALPHA, Graphics::BlendState::INV_SRC_ALPHA, Graphics::BlendState::OP_ADD);
-	_Viewport = new Graphics::D3D11Viewport(0, 0, 640, 480);
+	_Viewport = new Graphics::D3D11Viewport(0, 0, Graphics::Device::WIDTH, Graphics::Device::HEIGHT);
 	_DepthStencilState = new Graphics::D3D11DepthStencil(
 		Graphics::DepthTest(Graphics::DepthTest::ALL, Graphics::Comparison::LESS),
 		Graphics::StencilTest()
 	);
-	_DepthStencilBuffer = new Graphics::D3D11DepthStencilBuffer(640, 480);
+	_DepthStencilBuffer = new Graphics::D3D11DepthStencilBuffer(Graphics::Device::WIDTH, Graphics::Device::HEIGHT);
 	_ContextMatrix = Types::NewIdentity();
 
 	uint32_t Size = 256;
@@ -225,7 +226,7 @@ void RenderingTask::Execute()
 	_Context.UnbindShader<Graphics::Context::VERTEX>();
 	_Context.UnbindShader<Graphics::Context::PIXEL>();
 
-	static_cast<Graphics::D3D11Context&>(_Context).GetD3D11Context()->Flush();
+	//static_cast<Graphics::D3D11Context&>(_Context).GetD3D11Context()->Flush();
 
 	OutputDebugString("RENDERED\n");
 	SetState(DONE);

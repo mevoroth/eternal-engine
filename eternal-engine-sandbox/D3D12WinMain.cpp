@@ -5,6 +5,7 @@
 #include "Window/Window.hpp"
 #include "Input/WinInput/WinInput.hpp"
 
+#include "Graphics/Device.hpp"
 #include "d3d12/D3D12Device.hpp"
 #include "d3d12/D3D12CommandQueue.hpp"
 #include "d3d12/D3D12State.hpp"
@@ -33,7 +34,7 @@ void WINAPI D3D12WinMain(HINSTANCE hInstance,
 	LPSTR lpCmdLine,
 	int nCmdShow)
 {
-	Window WindowObj(hInstance, nCmdShow, "Eternal Sandbox", "EternalClass", 640, 480);
+	Window WindowObj(hInstance, nCmdShow, "Eternal Sandbox", "EternalClass", Device::WIDTH, Device::HEIGHT);
 
 	WinInput* WinInputObj = new WinInput();
 	WindowsProcess WinProcObj;
@@ -61,7 +62,7 @@ void WINAPI D3D12WinMain(HINSTANCE hInstance,
 		D3D12RenderTarget(DeviceObj)
 	};
 	D3D12State State(DeviceObj, InputLayout, VS, PS, DepthTestObj, StencilTestObj, BlendStates, RenderTargets, ETERNAL_ARRAYSIZE(RenderTargets));
-	Viewport ViewportObj(0, 0, 640, 480);
+	Viewport ViewportObj(0, 0, Device::WIDTH, Device::HEIGHT);
 
 	D3D12Constant DebugTextParametersConstant(DeviceObj, sizeof(DebugTextParameters));
 	D3D12CommandList CommandList(DeviceObj, DirectCommandQueue, State);
