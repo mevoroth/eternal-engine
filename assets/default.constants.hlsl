@@ -1,3 +1,6 @@
+#ifndef _DEFAULT_CONSTANTS_HLSL_
+#define _DEFAULT_CONSTANTS_HLSL_
+
 cbuffer ProjectionMatrix : register(b0)
 {
 	//matrix Model;
@@ -9,3 +12,5 @@ cbuffer ObjectMatrix : register(b1)
 {
 	matrix Model;
 };
+
+#endif
