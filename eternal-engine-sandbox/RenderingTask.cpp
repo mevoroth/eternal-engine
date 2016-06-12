@@ -27,6 +27,8 @@
 
 #include "Resources/TextureFactory.hpp"
 
+#include "imgui.h"
+
 using namespace Eternal;
 using namespace Eternal::Sandbox;
 using namespace Eternal::Types;
@@ -120,6 +122,14 @@ void RenderingTask::Setup()
 void RenderingTask::Execute()
 {
 	SetState(EXECUTING);
+
+	ImGui::Begin("Debug Camera");
+
+	ImGui::Text("Forward: (%f, %f, %f)", _ViewMatrix._31, _ViewMatrix._32, _ViewMatrix._33);
+	ImGui::Text("Position: (%f, %f, %f)", _ViewMatrix._41, _ViewMatrix._42, _ViewMatrix._43);
+
+	ImGui::End();
+
 	Graphics::RenderTarget* RenderTargets[] = {
 		nullptr,
 		nullptr,
@@ -140,10 +150,10 @@ void RenderingTask::Execute()
 
 	Graphics::Resource::LockedResource LockedResourceObj = ((Graphics::D3D11Constant*)_CameraConstant)->Lock(_Context, Graphics::Resource::LOCK_WRITE_DISCARD);
 	Matrix4x4* CameraMatrix = (Matrix4x4*)LockedResourceObj.Data;
-	XMMATRIX ProjMatrix = XMMatrixTranspose(XMLoadFloat4x4(&_ViewMatrix));
+	XMMATRIX ViewMatrix = XMMatrixTranspose(XMLoadFloat4x4(&_ViewMatrix));
 	//XMMATRIX ProjMatrix = XMMatrixIdentity();
 	_Camera->GetProjectionMatrix(*CameraMatrix);
-	XMStoreFloat4x4(CameraMatrix + 1, ProjMatrix);
+	XMStoreFloat4x4(CameraMatrix + 1, ViewMatrix);
 	((Graphics::D3D11Constant*)_CameraConstant)->Unlock(_Context);
 
 	_Context.BindShader<Graphics::Context::VERTEX>(_VS);

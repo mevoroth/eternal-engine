@@ -89,6 +89,15 @@
     <FxCompile Include="..\assets\debugtext.common.hlsl">
       <Filter>Fichiers de ressources</Filter>
     </FxCompile>
+    <FxCompile Include="..\assets\drawcolor.common.hlsl">
+      <Filter>Fichiers de ressources</Filter>
+    </FxCompile>
+    <FxCompile Include="..\assets\drawcolor.ps.hlsl">
+      <Filter>Fichiers de ressources</Filter>
+    </FxCompile>
+    <FxCompile Include="..\assets\drawcolor.vs.hlsl">
+      <Filter>Fichiers de ressources</Filter>
+    </FxCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SandboxGameState.hpp">

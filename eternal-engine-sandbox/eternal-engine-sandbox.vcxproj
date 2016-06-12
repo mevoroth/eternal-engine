@@ -71,7 +71,7 @@
     <LibraryPath>C:\Program Files\Autodesk\FBX\FBX SDK\2015.1\lib\vs2013\x86\debug;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>$(SolutionDir)\eternal-engine-core\include;$(SolutionDir)\eternal-engine-graphics\include;$(SolutionDir)\eternal-engine-components\include;$(SolutionDir)\eternal-engine-utils\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)\eternal-engine-core\include;$(SolutionDir)\eternal-engine-graphics\include;$(SolutionDir)\eternal-engine-components\include;$(SolutionDir)\eternal-engine-utils\include;$(SolutionDir)\eternal-engine-extern\imgui;$(IncludePath)</IncludePath>
     <LibraryPath>$(LibraryPath)</LibraryPath>
     <ExecutablePath>$(ExecutablePath)</ExecutablePath>
   </PropertyGroup>
@@ -186,6 +186,9 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </FxCompile>
+    <FxCompile Include="..\assets\drawcolor.common.hlsl" />
+    <FxCompile Include="..\assets\drawcolor.ps.hlsl" />
+    <FxCompile Include="..\assets\drawcolor.vs.hlsl" />
     <FxCompile Include="..\assets\water.common.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </FxCompile>

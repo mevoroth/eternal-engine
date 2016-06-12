@@ -143,7 +143,7 @@ int WINAPI WinMain(HINSTANCE hInstance,
 		Plane.PushTriangle(Triangle[0], Triangle[1], Triangle[2]);
 	}
 
-	PerspectiveCamera CameraObj(0.1f, 10000.f, 60.f);
+	PerspectiveCamera CameraObj(0.1f, 1000.f, 60.f);
 	OrthographicCamera OrthoCamObj(0.f, 1000.f, 1.f);
 
 	std::vector<Light> Lights;
@@ -179,7 +179,7 @@ int WINAPI WinMain(HINSTANCE hInstance,
 	ImguiEndTask* ImguiEndTaskObj = nullptr;
 	ControlsTask* ControlsTaskObj = nullptr;
 
-	ParentTransform.Transform.SetTranslation(Vector3(0.f, -100.f, 0.f));
+	ParentTransform.Transform.SetTranslation(Vector3(0.f, 0.f, 0.f));
 	CameraTransform.Transform.Rotate(Vector3(0.f, 0.f, 0.f));
 	//CameraTransform.Transform.Rotate(Vector3(0.f, 45.f * 3.1415f / 180.f, 0.f));
 	//CameraTransform.Transform.Rotate(Vector3(0.f, 0.f, 45.f * 3.1415f / 180.f));
@@ -218,23 +218,38 @@ int WINAPI WinMain(HINSTANCE hInstance,
 	{
 		WindowsProcess::ExecuteMessageLoop();
 
-		CameraTransform.Transform.Rotate(Vector3(
+		//CameraTransform.Transform.Rotate(Vector3(
+		//	0.f,
+		//	Input::Get()->GetAxis(Input::JOY0_RX) * 0.1f,
+		//	0.f
+		//));
+
+		//Vector3 Forward = CameraTransform.Transform.GetForward();
+		//Vector3 Right = CameraTransform.Transform.GetRight();
+		//Vector3 Up = ParentTransform.Transform.GetUp();
+
+		////CameraTransform.Translate(Input::Get()->GetAxis(Input::JOY0_LX) * 1.f * Right - Input::Get()->GetAxis(Input::JOY0_LY) * 1.f * Forward);
+		////ParentTransform.Transform.Translate(/*Vector3(
+		////	Input::Get()->GetAxis(Input::JOY0_LX) * 1.f,
+		////	-Input::Get()->GetAxis(Input::JOY0_RY) * 1.f,
+		////	-Input::Get()->GetAxis(Input::JOY0_LY) * 1.f
+		////)*/);
+		//ParentTransform.Transform.Translate(Input::Get()->GetAxis(Input::JOY0_LX) * 10.f * Right - Input::Get()->GetAxis(Input::JOY0_RY) * 10.f * Up - Input::Get()->GetAxis(Input::JOY0_LY) * 10.f * Forward);
+
+		ParentTransform.Transform.Rotate(Vector3(
 			0.f,
-			Input::Get()->GetAxis(Input::JOY0_RX) * 0.1f,
+			-Input::Get()->GetAxis(Input::JOY0_RX) * 0.1f,
 			0.f
 		));
 
-		Vector3 Forward = CameraTransform.Transform.GetForward();
-		Vector3 Right = CameraTransform.Transform.GetRight();
+		Vector3 Forward = ParentTransform.Transform.GetForward();
+		Vector3 Right = ParentTransform.Transform.GetRight();
 		Vector3 Up = ParentTransform.Transform.GetUp();
-
-		//CameraTransform.Translate(Input::Get()->GetAxis(Input::JOY0_LX) * 1.f * Right - Input::Get()->GetAxis(Input::JOY0_LY) * 1.f * Forward);
-		//ParentTransform.Transform.Translate(/*Vector3(
-		//	Input::Get()->GetAxis(Input::JOY0_LX) * 1.f,
-		//	-Input::Get()->GetAxis(Input::JOY0_RY) * 1.f,
-		//	-Input::Get()->GetAxis(Input::JOY0_LY) * 1.f
-		//)*/);
-		ParentTransform.Transform.Translate(Input::Get()->GetAxis(Input::JOY0_LX) * 10.f * Right - Input::Get()->GetAxis(Input::JOY0_RY) * 10.f * Up - Input::Get()->GetAxis(Input::JOY0_LY) * 10.f * Forward);
+		//- Input::Get()->GetAxis(Input::JOY0_LX) * 10.f * Right - Input::Get()->GetAxis(Input::JOY0_RY) * 10.f * Up - Input::Get()->GetAxis(Input::JOY0_LY) * 10.f * Forward
+		Vector3 Vect(-Input::Get()->GetAxis(Input::JOY0_LX) * 10.f, -Input::Get()->GetAxis(Input::JOY0_RY) * 10.f, -Input::Get()->GetAxis(Input::JOY0_LY) * 10.f);
+		
+		Vector4 Transformed = ParentTransform.Transform.GetModelMatrix() * Vector4(Vect.x, Vect.y, Vect.z, 0.0f);
+		ParentTransform.Transform.Translate(Vector3(Transformed.x, Transformed.y, Transformed.z));
 
 		//WaterRendering = new Eternal::Sandbox::WaterTask(RendererObj, *RendererObj.GetMainContext());
 		//WaterRendering->SetCamera(&CameraObj);
@@ -255,7 +270,7 @@ int WINAPI WinMain(HINSTANCE hInstance,
 
 		//Eternal::Sandbox::RenderingTask* PreviousRendering = Rendering;
 		////Rendering = new Eternal::Sandbox::RenderingTask(RendererObj, *RendererObj.GetMainContext(), &CameraObj, Lights, Content);
-		Rendering->SetViewMatrix(ParentTransform.Transform.GetModelMatrix() * CameraTransform.Transform.GetModelMatrix());
+		Rendering->SetViewMatrix(ParentTransform.Transform.GetModelMatrix());
 		////Rendering->SetMesh(&Plane);
 		//Rendering->SetMesh(&MeshObj);
 		//Rendering->SetDeferredQuad(&Plane);
