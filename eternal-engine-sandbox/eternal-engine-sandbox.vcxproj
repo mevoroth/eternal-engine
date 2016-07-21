@@ -143,11 +143,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="AppPools.cpp" />
     <ClCompile Include="D3D12WinMain.cpp" />
     <ClCompile Include="DebugTextTask.cpp" />
     <ClCompile Include="FakeTask.cpp" />
     <ClCompile Include="RenderingTask.cpp" />
     <ClCompile Include="SandboxGameState.cpp" />
+    <ClCompile Include="Tests.cpp" />
     <ClCompile Include="WindowsProcess.cpp" />
     <ClCompile Include="WaterTask.cpp" />
     <ClCompile Include="WinMain.cpp" />
@@ -186,9 +188,15 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </FxCompile>
-    <FxCompile Include="..\assets\drawcolor.common.hlsl" />
-    <FxCompile Include="..\assets\drawcolor.ps.hlsl" />
-    <FxCompile Include="..\assets\drawcolor.vs.hlsl" />
+    <FxCompile Include="..\assets\drawcolor.common.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="..\assets\drawcolor.ps.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </FxCompile>
+    <FxCompile Include="..\assets\drawcolor.vs.hlsl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+    </FxCompile>
     <FxCompile Include="..\assets\water.common.hlsl">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </FxCompile>
@@ -237,10 +245,12 @@
     </FxCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AppPools.hpp" />
     <ClInclude Include="DebugTextTask.hpp" />
     <ClInclude Include="FakeTask.hpp" />
     <ClInclude Include="RenderingTask.hpp" />
     <ClInclude Include="SandboxGameState.hpp" />
+    <ClInclude Include="Tests.hpp" />
     <ClInclude Include="WindowsProcess.hpp" />
     <ClInclude Include="WaterTask.hpp" />
   </ItemGroup>

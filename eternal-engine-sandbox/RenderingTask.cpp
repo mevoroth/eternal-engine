@@ -126,7 +126,7 @@ void RenderingTask::Execute()
 	ImGui::Begin("Debug Camera");
 
 	ImGui::Text("Forward: (%f, %f, %f)", _ViewMatrix._31, _ViewMatrix._32, _ViewMatrix._33);
-	ImGui::Text("Position: (%f, %f, %f)", _ViewMatrix._41, _ViewMatrix._42, _ViewMatrix._43);
+	ImGui::Text("Position: (%f, %f, %f)", -_ViewMatrix._41, -_ViewMatrix._42, -_ViewMatrix._43);
 
 	ImGui::End();
 
@@ -161,9 +161,7 @@ void RenderingTask::Execute()
 	_Context.BindShader<Graphics::Context::PIXEL>(_PS);
 
 	_Context.BindConstant<Graphics::Context::VERTEX>(0, _CameraConstant);
-	_Context.BindConstant<Graphics::Context::VERTEX>(1, _ModelConstant);
 	_Context.BindConstant<Graphics::Context::PIXEL>(0, _CameraConstant);
-	_Context.BindConstant<Graphics::Context::PIXEL>(1, _ModelConstant);
 
 	_Context.SetBlendMode(_BlendState);
 	_Context.SetViewport(_Viewport);
@@ -192,9 +190,7 @@ void RenderingTask::Execute()
 	_Context.UnbindSampler<Graphics::Context::PIXEL>(0);
 
 	_Context.UnbindConstant<Graphics::Context::VERTEX>(0);
-	_Context.UnbindConstant<Graphics::Context::VERTEX>(1);
 	_Context.UnbindConstant<Graphics::Context::PIXEL>(0);
-	_Context.UnbindConstant<Graphics::Context::PIXEL>(1);
 
 	_Context.UnbindShader<Graphics::Context::VERTEX>();
 	_Context.UnbindShader<Graphics::Context::GEOMETRY>();
@@ -278,27 +274,16 @@ void RenderingTask::_Draw(_In_ Components::Mesh* MeshObj)
 		memcpy(LockedResourceObj.Data, &_ContextMatrix, sizeof(Matrix4x4));
 		((Graphics::D3D11Constant*)_ModelConstant)->Unlock(_Context);
 
+		// TODO : REMOVE THIS
 		if (MeshObj->_Texture.length())
-		{
 			_Context.BindBuffer<Graphics::Context::PIXEL>(0, (Graphics::D3D11Texture*)Eternal::Resources::TextureFactory::Get()->GetTexture(MeshObj->_Texture));
-			_Context.DrawIndexed(MeshObj->GetVertexBuffer(), MeshObj->GetIndexBuffer());
+		_Context.BindConstant<Graphics::Context::VERTEX>(1, _ModelConstant);
+		_Context.BindConstant<Graphics::Context::PIXEL>(1, _ModelConstant);
+		_Context.DrawIndexed(MeshObj->GetVertexBuffer(), MeshObj->GetIndexBuffer());
+		_Context.UnbindConstant<Graphics::Context::VERTEX>(1);
+		_Context.UnbindConstant<Graphics::Context::PIXEL>(1);
+		if (MeshObj->_Texture.length())
 			_Context.UnbindBuffer<Graphics::Context::PIXEL>(0);
-			//uint32_t W, H;
-			//uint8_t* Data = Eternal::Resources::TextureFactory::Get()->GetTexture(MeshObj->_Texture, H, W);
-			//ETERNAL_ASSERT(Data);
-			//if (H >= 256)
-			//{
-			//	uint32_t TextureIndex = (uint32_t)(log2(H) - 8);
-			//	//Graphics::D3D11Texture* TempTex = new Graphics::D3D11Texture(Graphics::Texture::BGRA8888, Graphics::D3D11Resource::DYNAMIC, Graphics::D3D11Resource::WRITE, W, H, Data);
-			//	ETERNAL_ASSERT(TextureIndex < SIZE_COUNT);
-			//	Graphics::D3D11Resource::LockedResource LockedData = _Textures[TextureIndex]->Lock(_Context, Graphics::Resource::LOCK_WRITE_DISCARD);
-			//	memcpy(LockedData.Data, Data, H * W * 4);
-			//	_Textures[TextureIndex]->Unlock(_Context);
-			//	_Context.BindBuffer<Graphics::Context::PIXEL>(0, _Textures[TextureIndex]);
-			//	_Context.DrawIndexed(MeshObj->GetVertexBuffer(), MeshObj->GetIndexBuffer());
-			//	_Context.UnbindBuffer<Graphics::Context::PIXEL>(0);
-			//}
-		}
 	}
 	for (uint32_t SubMeshIndex = 0; SubMeshIndex < MeshObj->GetSubMeshesCount(); ++SubMeshIndex)
 	{

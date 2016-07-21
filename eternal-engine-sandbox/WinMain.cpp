@@ -59,9 +59,15 @@
 #include "Task/ImguiBeginTask.hpp"
 #include "Task/ImguiEndTask.hpp"
 #include "Task/ControlsTask.hpp"
+#include "Task/DebugTask.hpp"
 
 #include "Import/tga/ImportTga.hpp"
 #include "Resources/TextureFactory.hpp"
+#include "Resources/Pool.hpp"
+
+#include "Tests.hpp"
+
+#include "AppPools.hpp"
 
 using namespace Eternal::Graphics;
 using namespace Eternal::Import;
@@ -69,15 +75,37 @@ using namespace Eternal::Input;
 using namespace Eternal::Components;
 using namespace Eternal::Types;
 using namespace Eternal::Task;
-//void DrawMeshes(D3D11Renderer* renderer, const Mesh* mesh);
+using namespace Eternal::Resources;
 
 void D3D12Main();
+
+extern Pool<Transform>* g_TransformPool;
 
 int WINAPI WinMain(HINSTANCE hInstance,
 	HINSTANCE hPrevInstance,
 	LPSTR lpCmdLine,
 	int nCmdShow)
 {
+	Tests::ExecuteTest();
+
+	Eternal::Core::TransformComponent::Init();
+
+	//Pool<int, 2>* TestPool = new Pool<int, 2>();
+
+	//uint32_t Handle;
+	//int* truc = TestPool->Initialize(Handle);
+	//*truc = 0xDEAD;
+
+	//uint32_t Handle2;
+	//int* truc2 = TestPool->Initialize(Handle2);
+	//*truc2 = 0x4000DEAD;
+
+	//*(TestPool->Get(Handle)) = 0xDEAD0000;
+
+	//bool isok = TestPool->IsValid(Handle);
+	//TestPool->Release(Handle);
+	//isok = TestPool->IsValid(Handle);
+
 	D3D11Device DeviceObj(hInstance, nCmdShow, "Eternal Sandbox", "EternalClass");
 
 	Eternal::Input::WinInput* WinInputObj = new Eternal::Input::WinInput();
@@ -120,13 +148,14 @@ int WINAPI WinMain(HINSTANCE hInstance,
 	new ImportFbx();
 	GenericMesh<D3D11PosUVNormalVertexBuffer::PosUVNormalVertex, D3D11PosUVNormalVertexBuffer, D3D11UInt32IndexBuffer> MeshObj;
 	ImportFbx::Get()->Import("sponza.fbx", MeshObj);
+	//ImportFbx::Get()->Import("Liya.fbx", MeshObj);
 
 	GenericMesh<D3D11PosUVVertexBuffer::PosUVVertex, D3D11PosUVVertexBuffer, D3D11UInt32IndexBuffer> Plane;
 	D3D11PosUVVertexBuffer::PosUVVertex PlaneVertices[] = {
-		{ Vector4(-1.f, -1.f, 0.f, 1.f), Vector2(0.f, 0.f) },
-		{ Vector4(-1.f,  1.f, 0.f, 1.f), Vector2(0.f, 1.f) },
-		{ Vector4( 1.f,  1.f, 0.f, 1.f), Vector2(1.f, 1.f) },
-		{ Vector4( 1.f, -1.f, 0.f, 1.f), Vector2(1.f, 0.f) }
+		{ Vector4(-1.f, -1.f, 0.f, 1.f), Vector2(0.f, 1.f) },
+		{ Vector4(-1.f,  1.f, 0.f, 1.f), Vector2(0.f, 0.f) },
+		{ Vector4( 1.f,  1.f, 0.f, 1.f), Vector2(1.f, 0.f) },
+		{ Vector4( 1.f, -1.f, 0.f, 1.f), Vector2(1.f, 1.f) }
 	};
 	for (uint32_t VertexIndex = 0; VertexIndex < ETERNAL_ARRAYSIZE(PlaneVertices); ++VertexIndex)
 	{
@@ -143,7 +172,7 @@ int WINAPI WinMain(HINSTANCE hInstance,
 		Plane.PushTriangle(Triangle[0], Triangle[1], Triangle[2]);
 	}
 
-	PerspectiveCamera CameraObj(0.1f, 1000.f, 60.f);
+	PerspectiveCamera CameraObj(0.1f, 10000.f, 60.f);
 	OrthographicCamera OrthoCamObj(0.f, 1000.f, 1.f);
 
 	std::vector<Light> Lights;
@@ -169,7 +198,7 @@ int WINAPI WinMain(HINSTANCE hInstance,
 
 	Eternal::Core::TransformComponent ParentTransform;
 	Eternal::Core::TransformComponent CameraTransform;
-	CameraTransform.AttachTo(&ParentTransform);
+	//CameraTransform.AttachTo(&ParentTransform);
 
 	Eternal::Sandbox::RenderingTask* Rendering = nullptr;
 	Eternal::Sandbox::WaterTask* WaterRendering = nullptr;
@@ -178,9 +207,10 @@ int WINAPI WinMain(HINSTANCE hInstance,
 	ImguiBeginTask* ImguiBeginTaskObj = nullptr;
 	ImguiEndTask* ImguiEndTaskObj = nullptr;
 	ControlsTask* ControlsTaskObj = nullptr;
+	DebugTask* DebugTaskObj = nullptr;
 
-	ParentTransform.Transform.SetTranslation(Vector3(0.f, 0.f, 0.f));
-	CameraTransform.Transform.Rotate(Vector3(0.f, 0.f, 0.f));
+	ParentTransform.GetTransform().SetTranslation(Vector3(0.f, 0.f, 0.f));
+	//CameraTransform.Transform.Rotate(Vector3(0.f, 0.f, 0.f));
 	//CameraTransform.Transform.Rotate(Vector3(0.f, 45.f * 3.1415f / 180.f, 0.f));
 	//CameraTransform.Transform.Rotate(Vector3(0.f, 0.f, 45.f * 3.1415f / 180.f));
 
@@ -191,11 +221,17 @@ int WINAPI WinMain(HINSTANCE hInstance,
 	FakeTaskObj = new FakeTask();
 	FakeTaskObj->SetTaskName("Fake Task");
 	ImguiBeginTaskObj = new ImguiBeginTask(DeviceObj.GetWindow(), Device::WIDTH, Device::HEIGHT);
+	ImguiBeginTaskObj->SetTaskName("Imgui Begin");
 	ImguiBeginTaskObj->SetupKeyboard(WinInputObj);
 	ImguiEndTaskObj = new ImguiEndTask(*RendererObj.GetMainContext());
+	ImguiEndTaskObj->SetTaskName("Imgui End");
 	ControlsTaskObj = new ControlsTask();
+	ControlsTaskObj->SetTaskName("Controls Task");
 	ControlsTaskObj->RegisterInput(XInputObj);
 	ControlsTaskObj->RegisterInput(WinInputObj);
+	DebugTaskObj = new DebugTask(*RendererObj.GetMainContext());
+	DebugTaskObj->SetTaskName("Debug Task");
+	DebugTaskObj->SetRenderTarget(RendererObj.GetBackBuffer());
 
 	Rendering->SetMesh(&MeshObj);
 	Rendering->SetDeferredQuad(&Plane);
@@ -208,87 +244,78 @@ int WINAPI WinMain(HINSTANCE hInstance,
 	TaskManagerObj.GetTaskScheduler().PushTask(ImguiBeginTaskObj, ControlsTaskObj);
 	TaskManagerObj.GetTaskScheduler().PushTask(Rendering, ImguiBeginTaskObj);
 	TaskManagerObj.GetTaskScheduler().PushTask(DebugRendering, Rendering);
+	TaskManagerObj.GetTaskScheduler().PushTask(DebugTaskObj, DebugRendering);
 	TaskManagerObj.GetTaskScheduler().PushTask(FakeTaskObj);
 	{
-		TaskManagerObj.GetTaskScheduler().PushTask(ImguiEndTaskObj, DebugRendering);
+		TaskManagerObj.GetTaskScheduler().PushTask(ImguiEndTaskObj, DebugTaskObj);
 		TaskManagerObj.GetTaskScheduler().PushTask(ImguiEndTaskObj, FakeTaskObj);
 	}
+
+	Vector3 CameraPosition(0.f, 0.f, 0.f);
+	Vector3 CameraDirection(0.f, 1.f, 0.f);
+	Vector3 CameraUp(0.f, 0.f, 1.f);
 
 	for (;;)
 	{
 		WindowsProcess::ExecuteMessageLoop();
 
-		//CameraTransform.Transform.Rotate(Vector3(
+		ParentTransform.GetTransform().Rotate(Vector3(
+			-Input::Get()->GetAxis(Input::JOY0_RY) * 0.1f,
+			Input::Get()->GetAxis(Input::JOY0_RX) * 0.1f,
+			0.f
+		));
+		//ParentTransform.Transform.Rotate(Vector3(
 		//	0.f,
 		//	Input::Get()->GetAxis(Input::JOY0_RX) * 0.1f,
 		//	0.f
 		//));
 
-		//Vector3 Forward = CameraTransform.Transform.GetForward();
-		//Vector3 Right = CameraTransform.Transform.GetRight();
+		//Vector3 Forward = ParentTransform.Transform.GetForward();
+		//Vector3 Right = ParentTransform.Transform.GetRight();
 		//Vector3 Up = ParentTransform.Transform.GetUp();
 
-		////CameraTransform.Translate(Input::Get()->GetAxis(Input::JOY0_LX) * 1.f * Right - Input::Get()->GetAxis(Input::JOY0_LY) * 1.f * Forward);
-		////ParentTransform.Transform.Translate(/*Vector3(
-		////	Input::Get()->GetAxis(Input::JOY0_LX) * 1.f,
-		////	-Input::Get()->GetAxis(Input::JOY0_RY) * 1.f,
-		////	-Input::Get()->GetAxis(Input::JOY0_LY) * 1.f
-		////)*/);
-		//ParentTransform.Transform.Translate(Input::Get()->GetAxis(Input::JOY0_LX) * 10.f * Right - Input::Get()->GetAxis(Input::JOY0_RY) * 10.f * Up - Input::Get()->GetAxis(Input::JOY0_LY) * 10.f * Forward);
+		Matrix4x4 CameraMatrix = ParentTransform.GetTransform().GetModelMatrix();
 
-		ParentTransform.Transform.Rotate(Vector3(
-			0.f,
-			-Input::Get()->GetAxis(Input::JOY0_RX) * 0.1f,
-			0.f
-		));
+		Vector4 CameraDirection4(CameraDirection.x, CameraDirection.y, CameraDirection.z, 1.f);
+		Vector4 CameraUp4(CameraUp.x, CameraUp.y, CameraUp.z, 1.f);
 
-		Vector3 Forward = ParentTransform.Transform.GetForward();
-		Vector3 Right = ParentTransform.Transform.GetRight();
-		Vector3 Up = ParentTransform.Transform.GetUp();
+		Vector4 Forward4 = CameraMatrix * CameraDirection4;
+		Vector4 Up4 = CameraMatrix * CameraUp4;
+
+		Vector3 Forward(Forward4.x, Forward4.y, Forward4.z);
+		Vector3 Up(Up4.x, Up4.y, Up4.z);
+		Vector3 Right = Cross(Up, Forward);
+
 		//- Input::Get()->GetAxis(Input::JOY0_LX) * 10.f * Right - Input::Get()->GetAxis(Input::JOY0_RY) * 10.f * Up - Input::Get()->GetAxis(Input::JOY0_LY) * 10.f * Forward
-		Vector3 Vect(-Input::Get()->GetAxis(Input::JOY0_LX) * 10.f, -Input::Get()->GetAxis(Input::JOY0_RY) * 10.f, -Input::Get()->GetAxis(Input::JOY0_LY) * 10.f);
+		Vector3 Vect(Input::Get()->GetAxis(Input::JOY0_LX) * 10.f, 0.f, Input::Get()->GetAxis(Input::JOY0_LY) * 10.f);
+		//Vector3 Vect(Input::Get()->GetAxis(Input::JOY0_LX) * 10.f, Input::Get()->GetAxis(Input::JOY0_RY) * 10.f, Input::Get()->GetAxis(Input::JOY0_LY) * 10.f);
 		
-		Vector4 Transformed = ParentTransform.Transform.GetModelMatrix() * Vector4(Vect.x, Vect.y, Vect.z, 0.0f);
-		ParentTransform.Transform.Translate(Vector3(Transformed.x, Transformed.y, Transformed.z));
+		//Vector4 Transformed = ParentTransform.Transform.GetModelMatrix() * Vector4(Vect.x, Vect.y, Vect.z, 0.0f);
+		//ParentTransform.Transform.Translate(Vector3(Transformed.x, Transformed.y, Transformed.z));
 
-		//WaterRendering = new Eternal::Sandbox::WaterTask(RendererObj, *RendererObj.GetMainContext());
-		//WaterRendering->SetCamera(&CameraObj);
-		//Matrix4x4 Model = ParentTransform.Transform.GetModelMatrix();
-		//WaterRendering->SetViewMatrix(ParentTransform.Transform.GetModelMatrix() * CameraTransform.Transform.GetModelMatrix());
-		//WaterRendering->SetMesh(&Plane);
-		//WaterRendering->Execute();
-		//delete WaterRendering;
+		CameraPosition += Vect;
 
-		//Matrix4x4 blabla;
-		////Vector4 posdemerde(-1000.f, -1000.f, 0.f, 1.f);
-		//Vector4 posdemerde(-1000.f, 0.f, -1000.f, 1.f);
-		//CameraObj.GetProjectionMatrix(blabla);
-		//blabla = ParentTransform.Transform.GetModelMatrix() * CameraTransform.Transform.GetModelMatrix();
-		//XMStoreFloat4x4(&blabla, XMMatrixTranspose(XMLoadFloat4x4(&blabla)));
-		//XMVECTOR v = XMVector4Transform(XMLoadFloat4(&posdemerde), XMLoadFloat4x4(&blabla));
-		//ETERNAL_ASSERT(true);
+		Matrix4x4 CameraProjectionMatrix;
+		CameraObj.GetProjectionMatrix(CameraProjectionMatrix);
 
-		//Eternal::Sandbox::RenderingTask* PreviousRendering = Rendering;
-		////Rendering = new Eternal::Sandbox::RenderingTask(RendererObj, *RendererObj.GetMainContext(), &CameraObj, Lights, Content);
-		Rendering->SetViewMatrix(ParentTransform.Transform.GetModelMatrix());
-		////Rendering->SetMesh(&Plane);
-		//Rendering->SetMesh(&MeshObj);
-		//Rendering->SetDeferredQuad(&Plane);
-		//Rendering->SetRenderTargets((RenderTarget**)&RenderTargets, ETERNAL_ARRAYSIZE(RenderTargets));
-		//Rendering->SetBackBufferRenderTarget(RendererObj.GetBackBuffer());
-		////TaskManagerObj.Push(new FakeTask());
-		////Rendering->Setup();
-		////TaskManagerObj.Push(Rendering);
-		////TaskManagerObj.Barrier();
-		//Rendering->Execute();
-		////delete Rendering;
-		
-		//Matrix4x4 ViewMat = ParentTransform.Transform.GetModelMatrix() * CameraTransform.Transform.GetModelMatrix();
-		////ViewMat.m[0][]
-		//DebugRendering->Setup();
-		////DebugRendering->SetupText(std::string("Camera Position : (") + to_string(ViewMat._41) + std::string(", ") + to_string(ViewMat._42) + std::string(", ") + to_string(ViewMat._43) + std::string(")") /*+ ")"*/);
-		//DebugRendering->SetupText("abcdefghijklmnopqrstuvwxyz");
-		//DebugRendering->Execute();
+		XMMATRIX ProjMatrix = XMMatrixTranspose(XMLoadFloat4x4(&CameraProjectionMatrix));
+		XMStoreFloat4x4(&CameraProjectionMatrix, ProjMatrix);
+
+		//Matrix4x4 ViewMatrix(
+		//	1.f, 0.f, 0.f, 0.f,
+		//	0.f, 0.f, 1.f, 0.f,
+		//	0.f, -1.f, 0.f, 0.f,
+		//	0.f, 0.f, 0.f, 1.f
+		//);
+
+		Matrix4x4 ViewMatrix = NewLookToLH(CameraPosition, Forward, Up);
+
+		CameraProjectionMatrix = ViewMatrix * CameraProjectionMatrix;
+		ProjMatrix = XMMatrixTranspose(XMLoadFloat4x4(&CameraProjectionMatrix));
+		XMStoreFloat4x4(&CameraProjectionMatrix, ProjMatrix);
+
+		Rendering->SetViewMatrix(ViewMatrix/* * ParentTransform.Transform.GetModelMatrix()*/);
+		DebugTaskObj->SetModelViewProjectionMatrix(CameraProjectionMatrix);
 
 		TaskManagerObj.Schedule();
 		TaskManagerObj.Barrier();

@@ -54,7 +54,7 @@ float3 Lambert(GfxBuffer GfxBufferData, float4 Light, float3 View)
 {
 	float3 LightVector = normalize(Light.xyz - GfxBufferData.Position.xyz);
 	float3 Normal = GfxBufferData.Normal;
-	float NdotL = saturate(dot(Normal, -LightVector));
+	float NdotL = saturate(dot(Normal, LightVector));
 
 	//float3 DiffuseColor = Diffuse(GfxBufferData.Diffuse);
 	float3 DiffuseColor = GfxBufferData.Diffuse;

@@ -5,13 +5,13 @@
 #define WIN32_EXTRA_LEAN
 #include <windows.h>
 
-#include "Parallel/StdAtomicInt.hpp"
+#include "Parallel/StdAtomicS32.hpp"
 
 using namespace Eternal::Parallel;
 
 FakeTask::FakeTask()
 {
-	_State = new StdAtomicInt(0);
+	_State = new StdAtomicS32(0);
 }
 
 FakeTask::~FakeTask()

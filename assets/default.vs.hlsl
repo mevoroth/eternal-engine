@@ -19,9 +19,9 @@ VSOut VS( VSIn IN )
 {
 	VSOut OUT = (VSOut)0;
 	OUT.Pos = IN.Pos;
-	OUT.Pos.w = 1.f;
 
-	OUT.Pos = mul(OUT.Pos, (View));
+	OUT.Pos = mul(OUT.Pos, Model);
+	OUT.Pos = mul(OUT.Pos, View);
 	OUT.Pos = mul(OUT.Pos, Projection);
 
 	OUT.UV = IN.UV;

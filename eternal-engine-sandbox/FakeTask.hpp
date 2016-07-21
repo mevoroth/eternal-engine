@@ -9,7 +9,7 @@ namespace Eternal
 {
 	namespace Parallel
 	{
-		class AtomicInt;
+		class AtomicS32;
 	}
 }
 
@@ -24,7 +24,7 @@ public:
 	virtual void Reset() override;
 
 private:
-	AtomicInt* _State = nullptr;
+	AtomicS32* _State = nullptr;
 };
 
 #endif
