@@ -2,15 +2,18 @@
 #include "CommandLine/CommandLineParser.hpp"
 #include "Graphics/GraphicsContext.hpp"
 #include "Graphics/GraphicsContextFactory.hpp"
+#include "Proxy/ProxyGraphicsContext.hpp"
 #include "Graphics/Pipeline.hpp"
 #include "Proxy/ProxyPipeline.hpp"
-#include "Tools/PipelineDependency.hpp"
+#include "Tools/PipelineLibrary.hpp"
 #include "GraphicsEngine/Renderer.hpp"
-#include "File/FileFactory.hpp"
-#include "File/File.hpp"
-#include "File/FilePath.hpp"
 #include <string>
 #include <unordered_set>
+
+#include "Graphics/Shader.hpp"
+#include "Graphics/RootSignature.hpp"
+#include "Graphics/RootSignatureFactory.hpp"
+#include "Graphics/PipelineFactory.hpp"
 
 namespace Eternal
 {
@@ -43,37 +46,44 @@ namespace Eternal
 			using namespace Eternal::GraphicsEngine;
 			using namespace Eternal::FileSystem;
 
-			string PipelinesLibraryFileName = FilePath::FindOrCreate("pipelines_library", FileType::FILE_TYPE_CACHED_PIPELINES);
+			std::string DeviceTypeString = _CommandLineParser.ParseCommandLine("gfx");
+			DeviceType BakedDeviceType = ConvertStringToDeviceType(DeviceTypeString);
+			ETERNAL_ASSERT(BakedDeviceType != Graphics::DeviceType::DEVICE_TYPE_NULL);
 
-			File* PipelinesLibrary = CreateFileHandle(PipelinesLibraryFileName);
-			PipelinesLibrary->Open(File::OpenMode::WRITE);
-
-			GraphicsContext* EngineGraphicsContext = CreateGraphicsContext(DeviceType::DEVICE_TYPE_PROXY);
+			GraphicsContext* EngineGraphicsContext = CreateGraphicsContext(ProxyGraphicsContextCreateInformation(BakedDeviceType));
 			Renderer* EngineRenderer = new Renderer(*EngineGraphicsContext);
 
-			auto SerializePipelines = [PipelinesLibrary](_In_ vector<Pipeline*>& Pipelines) -> void
-			{
-				PipelinesLibrary->Serialize(
-					Pipelines,
-					[]() -> Pipeline* { return nullptr; },
-					[](_Inout_ Pipeline* InOutPipeline)
-					{
-						ProxyPipeline* CurrentProxyPipeline = static_cast<ProxyPipeline*>(InOutPipeline);
-					}
-				);
-			};
+			Shader* DebugScreenVS = EngineGraphicsContext->GetShader(ShaderCreateInformation(ShaderType::SHADER_TYPE_VERTEX, "ScreenVertex", "screen.vertex.hlsl"));
+			Shader* DebugScreenPS = EngineGraphicsContext->GetShader(ShaderCreateInformation(ShaderType::SHADER_TYPE_PIXEL, "ScreenPixel", "sampletexture.pixel.hlsl"));
 
-			const unordered_set<Pipeline*>& PipelinesSet = EngineGraphicsContext->GetPipelineDependency().GetPipelines();
-			vector<Pipeline*> Pipelines;
-			Pipelines.insert(Pipelines.end(), PipelinesSet.begin(), PipelinesSet.end());
-			SerializePipelines(Pipelines);
+			RootSignature* _RootSignature = CreateRootSignature(*EngineGraphicsContext,
+				RootSignatureCreateInformation(
+					{
+						RootSignatureParameter(RootSignatureParameterType::ROOT_SIGNATURE_PARAMETER_TEXTURE,	RootSignatureAccess::ROOT_SIGNATURE_ACCESS_PIXEL),
+						RootSignatureParameter(RootSignatureParameterType::ROOT_SIGNATURE_PARAMETER_SAMPLER,	RootSignatureAccess::ROOT_SIGNATURE_ACCESS_PIXEL)
+					}
+				)
+			);
+
+			Pipeline* _Pipeline = CreatePipeline(
+				*EngineGraphicsContext,
+				GraphicsPipelineCreateInformation(
+					_RootSignature,
+					EngineGraphicsContext->GetEmptyInputLayout(),
+					EngineGraphicsContext->GetBackBufferRenderPass(),
+					DebugScreenVS,
+					DebugScreenPS
+				)
+			);
+
+			EngineGraphicsContext->SerializePipelineLibrary(PipelineSerializationMode::PIPELINE_SERIALIZATION_MODE_WRITE);
+
+			DestroyPipeline(_Pipeline);
+			DestroyRootSignature(_RootSignature);
 
 			delete EngineRenderer;
 			EngineRenderer = nullptr;
 			DestroyGraphicsContext(EngineGraphicsContext);
-
-			PipelinesLibrary->Close();
-			DestroyFileHandle(PipelinesLibrary);
 		}
 	}
 }
