@@ -7,6 +7,7 @@
 #include "Proxy/ProxyPipeline.hpp"
 #include "Tools/PipelineLibrary.hpp"
 #include "GraphicsEngine/Renderer.hpp"
+#include "Imgui/Imgui.hpp"
 #include <string>
 #include <unordered_set>
 
@@ -45,6 +46,7 @@ namespace Eternal
 			using namespace Eternal::Graphics;
 			using namespace Eternal::GraphicsEngine;
 			using namespace Eternal::FileSystem;
+			using namespace Eternal::ImguiSystem;
 
 			std::string DeviceTypeString = _CommandLineParser.ParseCommandLine("gfx");
 			DeviceType BakedDeviceType = ConvertStringToDeviceType(DeviceTypeString);
@@ -52,6 +54,7 @@ namespace Eternal
 
 			GraphicsContext* EngineGraphicsContext = CreateGraphicsContext(ProxyGraphicsContextCreateInformation(BakedDeviceType));
 			Renderer* EngineRenderer = new Renderer(*EngineGraphicsContext);
+			Imgui* ImguiContext = new Imgui(*EngineGraphicsContext, *EngineRenderer, nullptr);
 
 			Shader* DebugScreenVS = EngineGraphicsContext->GetShader(ShaderCreateInformation(ShaderType::SHADER_TYPE_VERTEX, "ScreenVertex", "screen.vertex.hlsl"));
 			Shader* DebugScreenPS = EngineGraphicsContext->GetShader(ShaderCreateInformation(ShaderType::SHADER_TYPE_PIXEL, "ScreenPixel", "sampletexture.pixel.hlsl"));
@@ -81,6 +84,8 @@ namespace Eternal
 			DestroyPipeline(_Pipeline);
 			DestroyRootSignature(_RootSignature);
 
+			delete ImguiContext;
+			ImguiContext = nullptr;
 			delete EngineRenderer;
 			EngineRenderer = nullptr;
 			DestroyGraphicsContext(EngineGraphicsContext);
