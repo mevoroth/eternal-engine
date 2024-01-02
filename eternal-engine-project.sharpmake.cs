@@ -99,6 +99,13 @@ namespace EternalEngine
 				@"$(SolutionDir)eternal-engine-extern\optick\src",
 			});
 
+			if (InConfiguration.Platform != Platform.win64 && InConfiguration.Platform != Platform.win32)
+			{
+				InConfiguration.IncludePaths.AddRange(new string[] {
+					@"$(SolutionDir)eternal-engine-utils\UtilsPrivate\include"
+				});
+			}
+
 			// Forced includes
 			InConfiguration.ForcedIncludes.AddRange(new string[] {
 				"optick.h",
@@ -116,7 +123,8 @@ namespace EternalEngine
 
 			// Defines
 			InConfiguration.Defines.AddRange(new string[] {
-				"ETERNAL_USE_DXMATH_TYPES=1",
+				"ETERNAL_USE_PRIVATE=(!ETERNAL_PLATFORM_WINDOWS)",
+				"ETERNAL_USE_DXMATH_TYPES=(ETERNAL_PLATFORM_WINDOWS)",
 				"IMGUI_USER_CONFIG=\"Imgui/ImguiConfig.hpp\"",
 				"ETERNAL_USE_STD_PARALLEL=1",
 				"ETERNAL_PROFILER_USE_VERBOSE=0",
@@ -142,7 +150,7 @@ namespace EternalEngine
 				});
 			}
 
-			if (InTarget.GetPlatform() == Platform.win64 || InTarget.GetPlatform() == Platform.win32)
+			if (InTarget.Platform == Platform.win64 || InTarget.Platform == Platform.win32)
 			{
 				InConfiguration.ForcedIncludes.AddRange(new string[] {
 					"sal.h",
@@ -154,6 +162,7 @@ namespace EternalEngine
 					"_In_=",
 					"_Out_=",
 					"_Inout_=",
+					"__MACH__=1",
 				});
 			}
 		}
