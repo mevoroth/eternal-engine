@@ -24,6 +24,7 @@ namespace EternalEngine
 			base.ConfigureAll(InConfiguration, InTarget);
 
 			InConfiguration.Output = Configuration.OutputType.Exe;
+			InConfiguration.TargetFileFullExtension = null;
 
 			// Include paths
 			InConfiguration.IncludePaths.AddRange(new string[] {
@@ -72,8 +73,9 @@ namespace EternalEngine
 				});
 			}
 
-			if (InTarget.Platform == Platform.win32 || InTarget.Platform == Platform.win64)
+			if (ExtensionMethods.IsPC(InTarget.Platform))
 			{
+				InConfiguration.BypassAdditionalDependenciesPrefix = true;
 				InConfiguration.Options.Add(Options.Vc.Linker.SubSystem.Console);
 
 				if (InTarget.Optimization == Optimization.Debug)
