@@ -37,7 +37,18 @@ namespace EternalEngine
 		static readonly string[] SpecialFilterPrefixes = new string[] {
 			@"include",
 			@"src",
+			@"CorePrivate\include",
+			@"CorePrivate\src",
+			@"GraphicsPrivate\include",
+			@"GraphicsPrivate\src",
+			@"UtilsPrivate\include",
+			@"UtilsPrivate\src",
 		};
+
+		public static string AppendLibraryExtension(Platform InPlatform, string InLibraryName)
+		{
+			return InLibraryName + (ExtensionMethods.IsPC(InPlatform) ? ".lib" : ".a");
+		}
 
 		public EternalEngineBaseProject(EternalEngineProjectSettings InProjectSettings = new EternalEngineProjectSettings())
 		{
@@ -72,6 +83,11 @@ namespace EternalEngine
 		[Configure]
 		public virtual void ConfigureAll(Configuration InConfiguration, Target InTarget)
 		{
+			if (InTarget.Platform == Platform.prospero)
+			{
+				InConfiguration.TargetFileFullExtension = ".a";
+			}
+
 			InConfiguration.Output = Configuration.OutputType.Lib;
 			InConfiguration.ProjectFileName = "[project.Name]_[target.DevEnv]";
 			InConfiguration.ProjectPath = ProjectSourceRootPath;
@@ -96,15 +112,9 @@ namespace EternalEngine
 			InConfiguration.IncludePaths.AddRange(new string[] {
 				@"[conf.ProjectPath]\include",
 				@"$(SolutionDir)eternal-engine-utils\include",
+				@"$(SolutionDir)eternal-engine-utils\UtilsPrivate\include",
 				@"$(SolutionDir)eternal-engine-extern\optick\src",
 			});
-
-			if (InConfiguration.Platform != Platform.win64 && InConfiguration.Platform != Platform.win32)
-			{
-				InConfiguration.IncludePaths.AddRange(new string[] {
-					@"$(SolutionDir)eternal-engine-utils\UtilsPrivate\include"
-				});
-			}
 
 			// Forced includes
 			InConfiguration.ForcedIncludes.AddRange(new string[] {
@@ -132,10 +142,11 @@ namespace EternalEngine
 				"ETERNAL_USE_REVERSED_Z=1",
 				"_MBCS",
 				"_SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING",
+				"USE_OPTICK=" + (ExtensionMethods.IsPC(InTarget.Platform) ? "0" : "0"),
 			});
 
 			InConfiguration.Defines.AddRange(new string[] {
-				"ETERNAL_PLATFORM_WINDOWS=" + ((InTarget.Platform == Platform.win64 || InTarget.Platform == Platform.win32) ? "1" : "0"),
+				"ETERNAL_PLATFORM_WINDOWS=" + (ExtensionMethods.IsPC(InTarget.Platform) ? "1" : "0"),
 				"ETERNAL_PLATFORM_PROSPERO=" + ((InTarget.Platform == Platform.prospero) ? "1" : "0"),
 			});
 
@@ -144,13 +155,34 @@ namespace EternalEngine
 				InConfiguration.Options.Add(Options.Vc.Compiler.EnableAsan.Enable);
 				InConfiguration.Options.Add(Options.Vc.CodeAnalysis.RunCodeAnalysis.Enable);
 				InConfiguration.Options.Add(Options.Vc.CodeAnalysis.MicrosoftCodeAnalysis.Enable);
+				InConfiguration.Options.Add(Options.Vc.Linker.GenerateDebugInformation.Enable);
+				InConfiguration.Options.Add(Options.Clang.Compiler.GenerateDebugInformation.Enable);
 
 				InConfiguration.Defines.AddRange(new string[] {
 					"ETERNAL_DEBUG=1",
 				});
+
+				if (InTarget.Platform == Platform.prospero)
+				{
+					InConfiguration.AdditionalCompilerOptions.AddRange(new string[] {
+						"-g"
+					});
+				}
+			}
+			else
+			{
+				InConfiguration.Options.Add(Options.Vc.Compiler.EnableAsan.Disable);
+				InConfiguration.Options.Add(Options.Vc.CodeAnalysis.RunCodeAnalysis.Disable);
+				InConfiguration.Options.Add(Options.Vc.CodeAnalysis.MicrosoftCodeAnalysis.Disable);
+				InConfiguration.Options.Add(Options.Vc.Linker.GenerateDebugInformation.Disable);
+				InConfiguration.Options.Add(Options.Clang.Compiler.GenerateDebugInformation.Disable);
+
+				InConfiguration.Defines.AddRange(new string[] {
+					"ETERNAL_DEBUG=0",
+				});
 			}
 
-			if (InTarget.Platform == Platform.win64 || InTarget.Platform == Platform.win32)
+			if (ExtensionMethods.IsPC(InTarget.Platform))
 			{
 				InConfiguration.ForcedIncludes.AddRange(new string[] {
 					"sal.h",
