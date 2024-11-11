@@ -59,7 +59,7 @@ namespace EternalEngine
 				"FBXSDK_SHARED=1",
 			});
 
-			if (InTarget.Optimization == Optimization.Debug)
+			if (ExtensionMethods.IsPC(InTarget.Platform) && InTarget.Optimization == Optimization.Debug)
 			{
 				InConfiguration.LibraryPaths.AddRange(new string[] {
 					EternalEngineSettings.VulkanPath + @"\Lib",

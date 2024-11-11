@@ -101,6 +101,7 @@ namespace EternalEngine
 			InConfiguration.Options.Add(Options.Vc.Compiler.MultiProcessorCompilation.Enable);
 			InConfiguration.Options.Add(Options.Vc.Compiler.RTTI.Enable);
 			InConfiguration.Options.Add(Options.Vc.Compiler.FloatingPointModel.Strict);
+			InConfiguration.Options.Add(Options.Vc.Compiler.DisableLanguageExtensions.Disable);
 			InConfiguration.Options.AddRange(new Options.Vc.Compiler.DisableSpecificWarnings(new string[] {
 				"4065",
 				"4100",
@@ -133,6 +134,7 @@ namespace EternalEngine
 
 			// Defines
 			InConfiguration.Defines.AddRange(new string[] {
+				"ETERNAL_ENABLE_D3D12=(ETERNAL_PLATFORM_WINDOWS || ETERNAL_PLATFORM_SCARLETT)",
 				"ETERNAL_USE_PRIVATE=(!ETERNAL_PLATFORM_WINDOWS)",
 				"ETERNAL_USE_DXMATH_TYPES=(ETERNAL_PLATFORM_WINDOWS)",
 				"IMGUI_USER_CONFIG=\"Imgui/ImguiConfig.hpp\"",
@@ -142,25 +144,69 @@ namespace EternalEngine
 				"ETERNAL_USE_REVERSED_Z=1",
 				"_MBCS",
 				"_SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING",
+				"VC_EXTRALEAN=1",
+				"WIN32_LEAN_AND_MEAN=1",
+				"WIN32_EXTRA_LEAN=1",
+				"NOGDICAPMASKS=1",
+				//"NOVIRTUALKEYCODES=1",
+				//"NOWINMESSAGES=1",
+				//"NOWINSTYLES=1",
+				"NOSYSMETRICS=1",
+				"NOMENUS=1",
+				"NOICONS=1",
+				"NOKEYSTATES=1",
+				"NOSYSCOMMANDS=1",
+				"NORASTEROPS=1",
+				//"NOSHOWWINDOW=1",
+				"OEMRESOURCE=1",
+				"NOATOM=1",
+				//"NOCLIPBOARD=1",
+				//"NOCOLOR=1",
+				//"NOCTLMGR=1",
+				"NODRAWTEXT=1",
+				"NOGDI=1",
+				"NOKERNEL=1",
+				//"NOUSER=1",
+				//"NONLS=1",
+				//"NOMB=1",
+				"NOMEMMGR=1",
+				"NOMETAFILE=1",
+				"NOMINMAX=1",
+				//"NOMSG=1",
+				"NOOPENFILE=1",
+				"NOSCROLL=1",
+				"NOSERVICE=1",
+				"NOSOUND=1",
+				"NOTEXTMETRIC=1",
+				"NOWH=1",
+				"NOWINOFFSETS=1",
+				"NOCOMM=1",
+				"NOKANJI=1",
+				"NOHELP=1",
+				"NOPROFILER=1",
+				"NODEFERWINDOWPOS=1",
+				"NOMCX=1",
+				"_HAS_STD_BYTE=0",
 				"USE_OPTICK=" + (ExtensionMethods.IsPC(InTarget.Platform) ? "0" : "0"),
+				"ETERNAL_DEBUG=" + (InTarget.Optimization == Optimization.Debug ? "1" : "0"),
+				"ETERNAL_USE_NVIDIA_AFTERMATH=(ETERNAL_DEBUG &amp;&amp; 0)",
+				"ETERNAL_USE_DEBUG_LAYER=(ETERNAL_DEBUG &amp;&amp; !ETERNAL_USE_NVIDIA_AFTERMATH &amp;&amp; ETERNAL_PLATFORM_WINDOWS)",
+				"ETERNAL_USE_PIX=(ETERNAL_DEBUG &amp;&amp; !ETERNAL_USE_NVIDIA_AFTERMATH &amp;&amp; USE_PIX &amp;&amp; (ETERNAL_PLATFORM_WINDOWS || ETERNAL_PLATFORM_SCARLETT))",
 			});
 
 			InConfiguration.Defines.AddRange(new string[] {
 				"ETERNAL_PLATFORM_WINDOWS=" + (ExtensionMethods.IsPC(InTarget.Platform) ? "1" : "0"),
 				"ETERNAL_PLATFORM_PROSPERO=" + ((InTarget.Platform == Platform.prospero) ? "1" : "0"),
+				"ETERNAL_PLATFORM_SCARLETT=" + ((InTarget.Platform == Platform.scarlett) ? "1" : "0"),
 			});
 
 			if (InTarget.Optimization == Optimization.Debug)
 			{
-				InConfiguration.Options.Add(Options.Vc.Compiler.EnableAsan.Enable);
+				//InConfiguration.Options.Add(Options.Vc.Compiler.EnableAsan.Enable);
 				InConfiguration.Options.Add(Options.Vc.CodeAnalysis.RunCodeAnalysis.Enable);
 				InConfiguration.Options.Add(Options.Vc.CodeAnalysis.MicrosoftCodeAnalysis.Enable);
 				InConfiguration.Options.Add(Options.Vc.Linker.GenerateDebugInformation.Enable);
 				InConfiguration.Options.Add(Options.Clang.Compiler.GenerateDebugInformation.Enable);
-
-				InConfiguration.Defines.AddRange(new string[] {
-					"ETERNAL_DEBUG=1",
-				});
 
 				if (InTarget.Platform == Platform.prospero)
 				{
@@ -176,10 +222,6 @@ namespace EternalEngine
 				InConfiguration.Options.Add(Options.Vc.CodeAnalysis.MicrosoftCodeAnalysis.Disable);
 				InConfiguration.Options.Add(Options.Vc.Linker.GenerateDebugInformation.Disable);
 				InConfiguration.Options.Add(Options.Clang.Compiler.GenerateDebugInformation.Disable);
-
-				InConfiguration.Defines.AddRange(new string[] {
-					"ETERNAL_DEBUG=0",
-				});
 			}
 
 			if (ExtensionMethods.IsPC(InTarget.Platform))
@@ -188,13 +230,21 @@ namespace EternalEngine
 					"sal.h",
 				});
 			}
-			else
+			
+			if (InTarget.Platform == Platform.prospero)
 			{
 				InConfiguration.Defines.AddRange(new string[] {
 					"_In_=",
 					"_Out_=",
 					"_Inout_=",
 					"__MACH__=1",
+				});
+			}
+
+			if (InTarget.Platform == Platform.scarlett)
+			{
+				InConfiguration.Defines.AddRange(new string[] {
+					"IMGUI_DISABLE_WIN32_FUNCTIONS=1"
 				});
 			}
 		}
