@@ -184,6 +184,11 @@ FakesAssemblies/
 # VS Code
 .vs/
 
+# VS
+*.sln
+*.vcxproj
+*.vcxproj.filters
+
 # Assets
 assets/
 ReShieldProject/imgui.ini
