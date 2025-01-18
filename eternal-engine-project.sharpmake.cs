@@ -120,6 +120,9 @@ namespace EternalEngine
 			// Forced includes
 			InConfiguration.ForcedIncludes.AddRange(new string[] {
 				"optick.h",
+				"Macros/Macros.hpp",
+				"cstdint",
+				"vector"
 			});
 
 			if (ProjectSettings.IncludeHLSLReflection())
