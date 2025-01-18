@@ -1,4 +1,3 @@
-using ReShieldProject;
 using Sharpmake;
 
 [module: Sharpmake.Include(@"..\eternal-engine\eternal-engine-project.sharpmake.cs")]
