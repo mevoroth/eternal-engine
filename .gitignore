@@ -192,3 +192,5 @@ FakesAssemblies/
 # Assets
 assets/
 ReShieldProject/imgui.ini
+packages.config
+eternal-engine_vs2022_runtimedependencies.txt
