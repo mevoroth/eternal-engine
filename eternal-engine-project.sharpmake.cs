@@ -167,7 +167,7 @@ namespace EternalEngine
 				//"NOCOLOR=1",
 				//"NOCTLMGR=1",
 				"NODRAWTEXT=1",
-				"NOGDI=1",
+				//"NOGDI=1",
 				"NOKERNEL=1",
 				//"NOUSER=1",
 				//"NONLS=1",
