@@ -7,8 +7,9 @@ namespace EternalEngine
 	[Sharpmake.Generate]
 	public class EternalEngineProject : EternalEngineBaseProject
 	{
-		public EternalEngineProject()
+		public EternalEngineProject(System.Type InTargetType)
 			: base(
+				InTargetType,
 				new EternalEngineProjectSettings(
 					EternalEngineProjectSettingsFlags.EEPSF_IncludeSettingsHeader |
 					EternalEngineProjectSettingsFlags.EEPSF_IncludeHLSLReflection
@@ -18,7 +19,12 @@ namespace EternalEngine
 			Name = "eternal-engine";
 		}
 
-		public override void ConfigureAll(Configuration InConfiguration, Target InTarget)
+		public EternalEngineProject()
+			: this(typeof(Target))
+		{
+		}
+
+		public override void ConfigureAll(Configuration InConfiguration, ITarget InTarget)
 		{
 			base.ConfigureAll(InConfiguration, InTarget);
 
@@ -58,7 +64,7 @@ namespace EternalEngine
 				"FBXSDK_SHARED=1",
 			});
 
-			if (ExtensionMethods.IsPC(InTarget.Platform) && InTarget.Optimization == Optimization.Debug)
+			if (ExtensionMethods.IsPC(InTarget.GetFragment<Platform>()) && InTarget.GetFragment<Optimization>() == Optimization.Debug)
 			{
 				InConfiguration.LibraryPaths.AddRange(new string[] {
 					EternalEngineSettings.VulkanPath + @"\Lib",
@@ -72,12 +78,12 @@ namespace EternalEngine
 				});
 			}
 
-			if (ExtensionMethods.IsPC(InTarget.Platform))
+			if (ExtensionMethods.IsPC(InTarget.GetFragment<Platform>()))
 			{
 				InConfiguration.BypassAdditionalDependenciesPrefix = true;
 				InConfiguration.Options.Add(Options.Vc.Linker.SubSystem.Console);
 
-				if (InTarget.Optimization == Optimization.Debug)
+				if (InTarget.GetFragment<Optimization>() == Optimization.Debug)
 				{
 					InConfiguration.IncludePaths.AddRange(new string[] {
 						@"$(SolutionDir)packages\Microsoft.Direct3D.D3D12." + EternalEngineSettings.MicrosoftDirect3DD3D12Version + @"\Include",

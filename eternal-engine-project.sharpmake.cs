@@ -1,4 +1,6 @@
 using Sharpmake;
+using System.Reflection;
+using System.Xml.Linq;
 
 namespace EternalEngine
 {
@@ -30,11 +32,11 @@ namespace EternalEngine
 		private EternalEngineProjectSettingsFlags Flags = EternalEngineProjectSettingsFlags.EEPSF_None;
 	}
 
-	public abstract class EternalEngineBaseProject : Project
+	public class EternalEngineBaseProjectUtils
 	{
 		protected static readonly string ProjectSourceRootPath = @"[project.SharpmakeCsPath]";
 
-		static readonly string[] SpecialFilterPrefixes = new string[] {
+		public static readonly string[] SpecialFilterPrefixes = new string[] {
 			@"include",
 			@"src",
 			@"CorePrivate\include",
@@ -50,45 +52,68 @@ namespace EternalEngine
 			return InLibraryName + (ExtensionMethods.IsPC(InPlatform) ? ".lib" : ".a");
 		}
 
-		public EternalEngineBaseProject(EternalEngineProjectSettings InProjectSettings = new EternalEngineProjectSettings())
+		public static void Construct(Project InProject, System.Type InTargetType, EternalEngineProjectSettings InProjectSettings)
 		{
-			AddTargets(new Target(
-				EternalEngineSettings.ProjectPlatforms,
-				EternalEngineSettings.ProjectDevEnvs,
-				EternalEngineSettings.ProjectOptimizations
-			));
+			if (InTargetType == typeof(Target))
+			{
+				InProject.AddTargets(new Target(
+					EternalEngineSettings.ProjectPlatforms,
+					EternalEngineSettings.ProjectDevEnvs,
+					EternalEngineSettings.ProjectOptimizations
+				));
+			}
 
-			SourceRootPath = ProjectSourceRootPath;
+			if (InTargetType == typeof(AndroidTarget))
+			{
+				InProject.AddTargets(new AndroidTarget(
+					Platform.android,
+					EternalEngineSettings.ProjectDevEnvs,
+					EternalEngineSettings.ProjectOptimizations,
+					Blob.NoBlob,
+					BuildSystem.MSBuild,
+					Android.AndroidBuildType.Gradle
+				));
+			}
+
+			InProject.SourceRootPath = ProjectSourceRootPath;
 		}
 
-		public EternalEngineBaseProject(
-			string InModule,
-			EternalEngineProjectSettings InProjectSettings = new EternalEngineProjectSettings()
-		)
+		public static void Construct(Project InProject, System.Type InTargetType, string InModule, EternalEngineProjectSettings InProjectSettings)
 		{
-			Module = InModule;
-			ProjectSettings = InProjectSettings;
+			InProject.Name = "eternal-engine-" + InModule;
 
-			Name = "eternal-engine-" + InModule;
+			if (InTargetType == typeof(Target))
+			{
+				InProject.AddTargets(new Target(
+					EternalEngineSettings.ProjectPlatforms,
+					EternalEngineSettings.ProjectDevEnvs,
+					EternalEngineSettings.ProjectOptimizations
+				));
+			}
 
-			AddTargets(new Target(
-				EternalEngineSettings.ProjectPlatforms,
-				EternalEngineSettings.ProjectDevEnvs,
-				EternalEngineSettings.ProjectOptimizations
-			));
+			if (InTargetType == typeof(AndroidTarget))
+			{
+				InProject.AddTargets(new AndroidTarget(
+					Platform.android,
+					EternalEngineSettings.ProjectDevEnvs,
+					EternalEngineSettings.ProjectOptimizations,
+					Blob.NoBlob,
+					BuildSystem.MSBuild,
+					Android.AndroidBuildType.Gradle
+				));
+			}
 
-			SourceRootPath = ProjectSourceRootPath;
+			InProject.SourceRootPath = ProjectSourceRootPath;
 		}
 
-		[Configure]
-		public virtual void ConfigureAll(Configuration InConfiguration, Target InTarget)
+		public static void ConfigureAll(Project.Configuration InConfiguration, ITarget InTarget, EternalEngineProjectSettings InProjectSettings, string InModule)
 		{
-			if (InTarget.Platform == Platform.prospero)
+			if (InTarget.GetFragment<Platform>() == Platform.prospero)
 			{
 				InConfiguration.TargetFileFullExtension = ".a";
 			}
 
-			InConfiguration.Output = Configuration.OutputType.Lib;
+			InConfiguration.Output = Project.Configuration.OutputType.Lib;
 			InConfiguration.ProjectFileName = "[project.Name]_[target.DevEnv]";
 			InConfiguration.ProjectPath = ProjectSourceRootPath;
 
@@ -125,14 +150,14 @@ namespace EternalEngine
 				"vector"
 			});
 
-			if (ProjectSettings.IncludeHLSLReflection())
+			if (InProjectSettings.IncludeHLSLReflection())
 			{
 				InConfiguration.ForcedIncludes.Add("Types/HLSLReflection.hpp");
 			}
 
-			if (ProjectSettings.IncludeSettingsHeader())
+			if (InProjectSettings.IncludeSettingsHeader())
 			{
-				InConfiguration.ForcedIncludes.Add(Module[0].ToString().ToUpper() + Module.Substring(1) + "Settings.hpp");
+				InConfiguration.ForcedIncludes.Add(InModule[0].ToString().ToUpper() + InModule.Substring(1) + "Settings.hpp");
 			}
 
 			// Defines
@@ -190,20 +215,20 @@ namespace EternalEngine
 				"NODEFERWINDOWPOS=1",
 				"NOMCX=1",
 				"_HAS_STD_BYTE=0",
-				"USE_OPTICK=" + (ExtensionMethods.IsPC(InTarget.Platform) ? "0" : "0"),
-				"ETERNAL_DEBUG=" + (InTarget.Optimization == Optimization.Debug ? "1" : "0"),
+				"USE_OPTICK=" + (ExtensionMethods.IsPC(InTarget.GetFragment<Platform>()) ? "0" : "0"),
+				"ETERNAL_DEBUG=" + (InTarget.GetFragment<Optimization>() == Optimization.Debug ? "1" : "0"),
 				"ETERNAL_USE_NVIDIA_AFTERMATH=(ETERNAL_DEBUG &amp;&amp; 0)",
 				"ETERNAL_USE_DEBUG_LAYER=(ETERNAL_DEBUG &amp;&amp; !ETERNAL_USE_NVIDIA_AFTERMATH &amp;&amp; ETERNAL_PLATFORM_WINDOWS)",
 				"ETERNAL_USE_PIX=(ETERNAL_DEBUG &amp;&amp; !ETERNAL_USE_NVIDIA_AFTERMATH &amp;&amp; USE_PIX &amp;&amp; (ETERNAL_PLATFORM_WINDOWS || ETERNAL_PLATFORM_SCARLETT))",
 			});
 
 			InConfiguration.Defines.AddRange(new string[] {
-				"ETERNAL_PLATFORM_WINDOWS=" + (ExtensionMethods.IsPC(InTarget.Platform) ? "1" : "0"),
-				"ETERNAL_PLATFORM_PROSPERO=" + ((InTarget.Platform == Platform.prospero) ? "1" : "0"),
-				"ETERNAL_PLATFORM_SCARLETT=" + ((InTarget.Platform == Platform.scarlett) ? "1" : "0"),
+				"ETERNAL_PLATFORM_WINDOWS=" + (ExtensionMethods.IsPC(InTarget.GetFragment<Platform>()) ? "1" : "0"),
+				"ETERNAL_PLATFORM_PROSPERO=" + ((InTarget.GetFragment<Platform>() == Platform.prospero) ? "1" : "0"),
+				"ETERNAL_PLATFORM_SCARLETT=" + ((InTarget.GetFragment<Platform>() == Platform.scarlett) ? "1" : "0"),
 			});
 
-			if (InTarget.Optimization == Optimization.Debug)
+			if (InTarget.GetFragment<Optimization>() == Optimization.Debug)
 			{
 				//InConfiguration.Options.Add(Options.Vc.Compiler.EnableAsan.Enable);
 				InConfiguration.Options.Add(Options.Vc.CodeAnalysis.RunCodeAnalysis.Enable);
@@ -211,7 +236,7 @@ namespace EternalEngine
 				InConfiguration.Options.Add(Options.Vc.Linker.GenerateDebugInformation.Enable);
 				InConfiguration.Options.Add(Options.Clang.Compiler.GenerateDebugInformation.Enable);
 
-				if (InTarget.Platform == Platform.prospero)
+				if (InTarget.GetFragment<Platform>() == Platform.prospero)
 				{
 					InConfiguration.AdditionalCompilerOptions.AddRange(new string[] {
 						"-g"
@@ -227,14 +252,14 @@ namespace EternalEngine
 				InConfiguration.Options.Add(Options.Clang.Compiler.GenerateDebugInformation.Disable);
 			}
 
-			if (ExtensionMethods.IsPC(InTarget.Platform))
+			if (ExtensionMethods.IsPC(InTarget.GetFragment<Platform>()))
 			{
 				InConfiguration.ForcedIncludes.AddRange(new string[] {
 					"sal.h",
 				});
 			}
-			
-			if (InTarget.Platform == Platform.prospero)
+
+			if (InTarget.GetFragment<Platform>() == Platform.prospero)
 			{
 				InConfiguration.Defines.AddRange(new string[] {
 					"_In_=",
@@ -244,7 +269,7 @@ namespace EternalEngine
 				});
 			}
 
-			if (InTarget.Platform == Platform.scarlett)
+			if (InTarget.GetFragment<Platform>() == Platform.scarlett)
 			{
 				InConfiguration.Defines.AddRange(new string[] {
 					"IMGUI_DISABLE_WIN32_FUNCTIONS=1"
@@ -252,12 +277,7 @@ namespace EternalEngine
 			}
 		}
 
-		public override bool ResolveFilterPath(string InRelativePath, out string OutFilterPath)
-		{
-			return InternalResolveFilterPath(InRelativePath, SpecialFilterPrefixes, out OutFilterPath);
-		}
-
-		protected bool InternalResolveFilterPath(string InRelativePath, string[] InSpecialFilterPrefixes, out string OutFilterPath)
+		public static bool InternalResolveFilterPath(string InRelativePath, string[] InSpecialFilterPrefixes, out string OutFilterPath)
 		{
 			for (int SpecialFilterPrefixIndex = 0; SpecialFilterPrefixIndex < InSpecialFilterPrefixes.Length; SpecialFilterPrefixIndex++)
 			{
@@ -271,6 +291,75 @@ namespace EternalEngine
 
 			OutFilterPath = null;
 			return false;
+		}
+	}
+
+	public abstract class EternalEngineBaseProject : Project
+	{
+		public EternalEngineBaseProject(System.Type InTargetType, EternalEngineProjectSettings InProjectSettings = new EternalEngineProjectSettings())
+			: base(InTargetType)
+		{
+			EternalEngineBaseProjectUtils.Construct(this, InTargetType, InProjectSettings);
+		}
+
+		public EternalEngineBaseProject(
+			System.Type InTargetType,
+			string InModule,
+			EternalEngineProjectSettings InProjectSettings = new EternalEngineProjectSettings()
+		)
+			: base(InTargetType)
+		{
+			Module = InModule;
+			ProjectSettings = InProjectSettings;
+
+			EternalEngineBaseProjectUtils.Construct(this, InTargetType, InModule, InProjectSettings);
+		}
+
+		[Configure]
+		public virtual void ConfigureAll(Configuration InConfiguration, ITarget InTarget)
+		{
+			EternalEngineBaseProjectUtils.ConfigureAll(InConfiguration, InTarget, ProjectSettings, Module);
+		}
+
+		public override bool ResolveFilterPath(string InRelativePath, out string OutFilterPath)
+		{
+			return EternalEngineBaseProjectUtils.InternalResolveFilterPath(InRelativePath, EternalEngineBaseProjectUtils.SpecialFilterPrefixes, out OutFilterPath);
+		}
+
+		private EternalEngineProjectSettings ProjectSettings;
+		private string Module;
+	}
+
+	public abstract class EternalEngineBaseAndroidProject : AndroidPackageProject
+	{
+		public EternalEngineBaseAndroidProject(System.Type InTargetType, EternalEngineProjectSettings InProjectSettings = new EternalEngineProjectSettings())
+			: base(InTargetType)
+		{
+			EternalEngineBaseProjectUtils.Construct(this, InTargetType, InProjectSettings);
+		}
+
+		public EternalEngineBaseAndroidProject(
+			System.Type InTargetType,
+			string InModule,
+			EternalEngineProjectSettings InProjectSettings = new EternalEngineProjectSettings()
+		)
+			: base(InTargetType)
+		{
+			Module = InModule;
+			ProjectSettings = InProjectSettings;
+
+			EternalEngineBaseProjectUtils.Construct(this, InTargetType, InModule, InProjectSettings);
+		}
+
+		[Configure]
+		public virtual void ConfigureAll(Configuration InConfiguration, ITarget InTarget)
+		{
+			EternalEngineBaseProjectUtils.ConfigureAll(InConfiguration, InTarget, ProjectSettings, Module);
+		}
+
+		public override bool ResolveFilterPath(string InRelativePath, out string OutFilterPath)
+		{
+			return EternalEngineBaseProjectUtils.InternalResolveFilterPath(InRelativePath, EternalEngineBaseProjectUtils.SpecialFilterPrefixes, out OutFilterPath);
 		}
 
 		private EternalEngineProjectSettings ProjectSettings;
