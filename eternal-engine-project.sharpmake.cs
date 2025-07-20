@@ -296,40 +296,38 @@ namespace EternalEngine
 
 	public class EternalEngineBaseExecutableProjectUtils
 	{
-		public static void ConfigureAll(Project.Configuration InConfiguration, ITarget InTarget)
+		public static void ConfigureAll(Project.Configuration InConfiguration, ITarget InTarget, string InModule, System.Type InTargetType)
 		{
-
-			InConfiguration.Output = Configuration.OutputType.Exe;
+			InConfiguration.Output = Project.Configuration.OutputType.Exe;
 			InConfiguration.TargetFileFullExtension = null;
 
 			// Include paths
 			InConfiguration.IncludePaths.AddRange(new string[] {
-				@"$(SolutionDir)Sting",
+				@"$(SolutionDir)" + InModule,
 				@"$(SolutionDir)eternal-engine-core\include",
 				@"$(SolutionDir)eternal-engine-graphics\include",
 				@"$(SolutionDir)eternal-engine-components\include",
 				@"$(SolutionDir)eternal-engine-extern\include",
 				@"$(SolutionDir)eternal-engine-extern\imgui",
-				@"$(SolutionDir)eternal-engine-shaders",
-				@"$(SolutionDir)assets\shaders",
+				@"$(SolutionDir)eternal-engine-shaders"
 			});
 
-			if (!ExtensionMethods.IsPC(InTarget.Platform))
+			if (!ExtensionMethods.IsPC(InTarget.GetFragment<Platform>()))
 			{
 				InConfiguration.IncludePaths.AddRange(new string[] {
-					@"$(SolutionDir)Sting",
+					@"$(SolutionDir)" + InModule,
 					@"$(SolutionDir)eternal-engine-core\CorePrivate\include",
 					@"$(SolutionDir)eternal-engine-graphics\GraphicsPrivate\include",
 				});
 			}
 
 			InConfiguration.ForcedIncludes.AddRange(new string[] {
-				@"Sting.hpp",
+				InModule + ".hpp",
 				@"Types/HLSLReflection.hpp",
 			});
 
 			// Libraries
-			if (ExtensionMethods.IsPC(InTarget.Platform))
+			if (ExtensionMethods.IsPC(InTarget.GetFragment<Platform>()))
 			{
 				InConfiguration.LibraryFiles.AddRange(new string[] {
 					"Xinput9_1_0.lib",
@@ -354,6 +352,7 @@ namespace EternalEngine
 					"shaderc_shared.lib",
 					"dxcompiler.lib",
 					"Xaudio2.lib",
+					"Ws2_32.lib",
 				});
 			}
 
@@ -363,7 +362,7 @@ namespace EternalEngine
 				"FBXSDK_SHARED=1",
 			});
 
-			if (ExtensionMethods.IsPC(InTarget.Platform) && InTarget.Optimization == Optimization.Debug)
+			if (ExtensionMethods.IsPC(InTarget.GetFragment<Platform>()) && InTarget.GetFragment<Optimization>() == Optimization.Debug)
 			{
 				InConfiguration.LibraryPaths.AddRange(new string[] {
 					EternalEngineSettings.VulkanPath + @"\Lib",
@@ -377,11 +376,11 @@ namespace EternalEngine
 				});
 			}
 
-			if (ExtensionMethods.IsPC(InTarget.Platform))
+			if (ExtensionMethods.IsPC(InTarget.GetFragment<Platform>()))
 			{
 				InConfiguration.Options.Add(Options.Vc.Linker.SubSystem.Windows);
 
-				if (InTarget.Optimization == Optimization.Debug)
+				if (InTarget.GetFragment<Optimization>() == Optimization.Debug)
 				{
 					InConfiguration.IncludePaths.AddRange(new string[] {
 						@"$(SolutionDir)packages\Microsoft.Direct3D.D3D12." + EternalEngineSettings.MicrosoftDirect3DD3D12Version + @"\Include",
@@ -402,25 +401,43 @@ namespace EternalEngine
 				}
 			}
 
-			if (ExtensionMethods.IsPC(InTarget.Platform) || InTarget.Platform == Platform.scarlett)
+			if (ExtensionMethods.IsPC(InTarget.GetFragment<Platform>()) || InTarget.GetFragment<Platform>() == Platform.scarlett)
 			{
 				InConfiguration.SourceFilesBuildExcludeRegex.Add(@".*\\main.cpp$");
 			}
-			if (InTarget.Platform == Platform.prospero || InTarget.Platform == Platform.scarlett)
+			if (InTarget.GetFragment<Platform>() == Platform.prospero || InTarget.GetFragment<Platform>() == Platform.scarlett)
 			{
 				InConfiguration.SourceFilesBuildExcludeRegex.Add(@".*\\WinMain.cpp");
 			}
-			if (ExtensionMethods.IsPC(InTarget.Platform) || InTarget.Platform == Platform.prospero)
+			if (ExtensionMethods.IsPC(InTarget.GetFragment<Platform>()) || InTarget.GetFragment<Platform>() == Platform.prospero)
 			{
 				InConfiguration.SourceFilesBuildExcludeRegex.Add(@".*\\XSXMain.cpp");
 			}
 
-			InConfiguration.AddPublicDependency<EternalEngineComponentsProject>(InTarget);
-			InConfiguration.AddPublicDependency<EternalEngineCoreProject>(InTarget);
-			InConfiguration.AddPublicDependency<EternalEngineExternProject>(InTarget);
-			InConfiguration.AddPublicDependency<EternalEngineGraphicsProject>(InTarget);
-			InConfiguration.AddPrivateDependency<EternalEngineShadersProject>(InTarget);
-			InConfiguration.AddPublicDependency<EternalEngineUtilsProject>(InTarget);
+			if (InTarget.GetFragment<Platform>() == Platform.android)
+			{
+				InConfiguration.Options.Add(Options.Android.General.AndroidAPILevel.Android29);
+			}
+
+			if (InTargetType == typeof(Target))
+			{
+				InConfiguration.AddPublicDependency<EternalEngineComponentsProject>(InTarget);
+				InConfiguration.AddPublicDependency<EternalEngineCoreProject>(InTarget);
+				InConfiguration.AddPublicDependency<EternalEngineExternProject>(InTarget);
+				InConfiguration.AddPublicDependency<EternalEngineGraphicsProject>(InTarget);
+				InConfiguration.AddPrivateDependency<EternalEngineShadersProject>(InTarget);
+				InConfiguration.AddPublicDependency<EternalEngineUtilsProject>(InTarget);
+			}
+
+			if (InTargetType == typeof(AndroidTarget))
+			{
+				InConfiguration.AddPublicDependency<EternalEngineComponentsAndroidProject>(InTarget);
+				InConfiguration.AddPublicDependency<EternalEngineCoreAndroidProject>(InTarget);
+				InConfiguration.AddPublicDependency<EternalEngineExternAndroidProject>(InTarget);
+				InConfiguration.AddPublicDependency<EternalEngineGraphicsAndroidProject>(InTarget);
+				InConfiguration.AddPrivateDependency<EternalEngineShadersAndroidProject>(InTarget);
+				InConfiguration.AddPublicDependency<EternalEngineUtilsAndroidProject>(InTarget);
+			}
 		}
 	}
 
@@ -457,7 +474,7 @@ namespace EternalEngine
 		}
 
 		private EternalEngineProjectSettings ProjectSettings;
-		private string Module;
+		protected string Module;
 	}
 
 	public abstract class EternalEngineBaseAndroidProject : AndroidPackageProject
@@ -493,7 +510,7 @@ namespace EternalEngine
 		}
 
 		private EternalEngineProjectSettings ProjectSettings;
-		private string Module;
+		protected string Module;
 	}
 
 	public abstract class EternalEngineBaseExecutableProject : EternalEngineBaseProject
@@ -506,6 +523,21 @@ namespace EternalEngine
 		public override void ConfigureAll(Configuration InConfiguration, ITarget InTarget)
 		{
 			base.ConfigureAll(InConfiguration, InTarget);
+			EternalEngineBaseExecutableProjectUtils.ConfigureAll(InConfiguration, InTarget, Module, Targets.TargetType);
+		}
+	}
+
+	public abstract class EternalEngineBaseAndroidExecutableProject : EternalEngineBaseAndroidProject
+	{
+		public EternalEngineBaseAndroidExecutableProject()
+			: base(typeof(AndroidTarget))
+		{
+		}
+
+		public override void ConfigureAll(Configuration InConfiguration, ITarget InTarget)
+		{
+			base.ConfigureAll(InConfiguration, InTarget);
+			EternalEngineBaseExecutableProjectUtils.ConfigureAll(InConfiguration, InTarget, Module, Targets.TargetType);
 		}
 	}
 }
