@@ -120,7 +120,7 @@ namespace EternalEngine
 			Name = "EternalEngine";
 
 			AddTargets(new Target(
-				Platform.win32 | Platform.win64,
+				EternalEngineSettings.ProjectPlatforms,
 				EternalEngineSettings.ProjectDevEnvs,
 				EternalEngineSettings.ProjectOptimizations
 			));
