@@ -66,7 +66,7 @@ namespace EternalEngine
 			if (InTargetType == typeof(AndroidTarget))
 			{
 				InProject.AddTargets(new AndroidTarget(
-					Platform.android,
+					Platform.agde,
 					EternalEngineSettings.ProjectDevEnvs,
 					EternalEngineSettings.ProjectOptimizations,
 					Blob.NoBlob,
@@ -94,7 +94,7 @@ namespace EternalEngine
 			if (InTargetType == typeof(AndroidTarget))
 			{
 				InProject.AddTargets(new AndroidTarget(
-					Platform.android,
+					Platform.agde,
 					EternalEngineSettings.ProjectDevEnvs,
 					EternalEngineSettings.ProjectOptimizations,
 					Blob.NoBlob,
@@ -114,7 +114,7 @@ namespace EternalEngine
 			}
 
 			InConfiguration.Output = Project.Configuration.OutputType.Lib;
-			InConfiguration.ProjectFileName = "[project.Name]_[target.DevEnv]";
+			InConfiguration.ProjectFileName = string.Format("[project.Name]{0}_[target.DevEnv]", InTarget.GetFragment<Platform>() == Platform.agde ? "_android" : "");
 			InConfiguration.ProjectPath = ProjectSourceRootPath;
 
 			// Options
@@ -215,7 +215,7 @@ namespace EternalEngine
 				"NODEFERWINDOWPOS=1",
 				"NOMCX=1",
 				"_HAS_STD_BYTE=0",
-				"USE_OPTICK=" + (ExtensionMethods.IsPC(InTarget.GetFragment<Platform>()) ? "0" : "0"),
+				"USE_OPTICK=" + (ExtensionMethods.IsPC(InTarget.GetFragment<Platform>()) ? "1" : "0"),
 				"ETERNAL_DEBUG=" + (InTarget.GetFragment<Optimization>() == Optimization.Debug ? "1" : "0"),
 				"ETERNAL_USE_NVIDIA_AFTERMATH=(ETERNAL_DEBUG &amp;&amp; 0)",
 				"ETERNAL_USE_DEBUG_LAYER=(ETERNAL_DEBUG &amp;&amp; !ETERNAL_USE_NVIDIA_AFTERMATH &amp;&amp; ETERNAL_PLATFORM_WINDOWS)",
@@ -274,6 +274,11 @@ namespace EternalEngine
 				InConfiguration.Defines.AddRange(new string[] {
 					"IMGUI_DISABLE_WIN32_FUNCTIONS=1"
 				});
+			}
+
+			if (InTarget.GetFragment<Platform>() == Platform.android || InTarget.GetFragment<Platform>() == Platform.agde)
+			{
+				InConfiguration.Options.Add(Options.Android.General.AndroidAPILevel.Android29);
 			}
 		}
 
@@ -414,7 +419,7 @@ namespace EternalEngine
 				InConfiguration.SourceFilesBuildExcludeRegex.Add(@".*\\XSXMain.cpp");
 			}
 
-			if (InTarget.GetFragment<Platform>() == Platform.android)
+			if (InTarget.GetFragment<Platform>() == Platform.android || InTarget.GetFragment<Platform>() == Platform.agde)
 			{
 				InConfiguration.Options.Add(Options.Android.General.AndroidAPILevel.Android29);
 			}
@@ -477,7 +482,7 @@ namespace EternalEngine
 		protected string Module;
 	}
 
-	public abstract class EternalEngineBaseAndroidProject : AndroidPackageProject
+	public abstract class EternalEngineBaseAndroidProject : Project
 	{
 		public EternalEngineBaseAndroidProject(System.Type InTargetType, EternalEngineProjectSettings InProjectSettings = new EternalEngineProjectSettings())
 			: base(InTargetType)
