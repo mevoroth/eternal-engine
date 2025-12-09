@@ -1,6 +1,7 @@
 using Sharpmake;
 using System.Reflection;
 using System.Xml.Linq;
+using System.IO;
 
 namespace EternalEngine
 {
@@ -47,6 +48,12 @@ namespace EternalEngine
 			@"UtilsPrivate\src",
 		};
 
+		public static bool IsAndroid(ITarget InTarget)
+		{
+			Platform TargetPlatform = InTarget.GetFragment<Platform>();
+			return TargetPlatform == Platform.agde || TargetPlatform == Platform.android;
+		}
+
 		public static string AppendLibraryExtension(Platform InPlatform, string InLibraryName)
 		{
 			return InLibraryName + (ExtensionMethods.IsPC(InPlatform) ? ".lib" : ".a");
@@ -54,7 +61,7 @@ namespace EternalEngine
 
 		public static string MakeForcedInclude(ITarget InTarget, string InIncludeFolder, string InIncludeFile)
 		{
-			return InTarget.GetFragment<Platform>() == Platform.agde || InTarget.GetFragment<Platform>() == Platform.android
+			return IsAndroid(InTarget)
 				? string.Format("{0}/{1}", InIncludeFolder, InIncludeFile)
 				: InIncludeFile;
 		}
@@ -124,6 +131,12 @@ namespace EternalEngine
 			InConfiguration.ProjectFileName = string.Format("[project.Name]{0}_[target.DevEnv]", InTarget.GetFragment<Platform>() == Platform.agde ? "_android" : "");
 			InConfiguration.ProjectPath = ProjectSourceRootPath;
 
+			if (InTarget.GetFragment<Platform>() == Platform.agde ||
+				InTarget.GetFragment<Platform>() == Platform.android)
+			{
+				InConfiguration.TargetLibraryPath = "[conf.TargetPath]/$(PlatformTarget)/";
+			}
+
 			Android.GlobalSettings.AndroidHome = EternalEngineSettings.AndroidHomePath;
 			Android.GlobalSettings.NdkRoot = EternalEngineSettings.NDKRootPath;
 			Android.GlobalSettings.JavaHome = EternalEngineSettings.JavaHomePath;
@@ -137,6 +150,7 @@ namespace EternalEngine
 			InConfiguration.Options.Add(Options.Vc.General.WarningLevel.Level4);
 			//InConfiguration.Options.Add(Options.Vc.General.TreatWarningsAsErrors.Enable);
 			InConfiguration.Options.Add(Options.Vc.Compiler.Exceptions.Enable);
+			InConfiguration.Options.Add(Options.Agde.Compiler.ExceptionHandling.Enable);
 			InConfiguration.Options.Add(Options.Vc.Compiler.MultiProcessorCompilation.Enable);
 			InConfiguration.Options.Add(Options.Vc.Compiler.RTTI.Enable);
 			InConfiguration.Options.Add(Options.Vc.Compiler.FloatingPointModel.Strict);
@@ -161,7 +175,7 @@ namespace EternalEngine
 				MakeForcedInclude(InTarget, @"$(SolutionDir)eternal-engine-extern\optick\src", "optick.h"),
 				MakeForcedInclude(InTarget, @"$(SolutionDir)eternal-engine-utils\include", "Macros/Macros.hpp"),
 				MakeForcedInclude(InTarget, @"$(AndroidNdkToolChain)\include\c++\4.9.x", "cstdint"),
-				MakeForcedInclude(InTarget, @"$(AndroidNdkToolChain)\sysroot\usr\include\c++\v1", "vector")
+				MakeForcedInclude(InTarget, @"$(AndroidNdkToolChain)\sysroot\usr\include\c++\v1", "vector"),
 			});
 
 			if (InProjectSettings.IncludeHLSLReflection())
@@ -282,8 +296,7 @@ namespace EternalEngine
 				});
 			}
 
-			if (InTarget.GetFragment<Platform>() != Platform.win32 &&
-				InTarget.GetFragment<Platform>() != Platform.win64 &&
+			if (!ExtensionMethods.IsPC(InTarget.GetFragment<Platform>()) &&
 				InTarget.GetFragment<Platform>() != Platform.scarlett)
 			{
 				InConfiguration.Defines.AddRange(new string[] {
@@ -305,6 +318,22 @@ namespace EternalEngine
 				InConfiguration.Defines.AddRange(new string[] {
 					"IMGUI_DISABLE_WIN32_FUNCTIONS=1"
 				});
+			}
+
+			if (InTarget.GetFragment<Platform>() == Platform.agde ||
+				InTarget.GetFragment<Platform>() == Platform.android)
+			{
+				InConfiguration.IncludePaths.AddRange(new string[] {
+					@"$(AndroidNdkDirectory)\sources"
+				});
+
+				InConfiguration.ForcedIncludes.AddRange(new string[] {
+					MakeForcedInclude(InTarget, @"$(SolutionDir)eternal-engine-utils\include", "StdLib/Android/AndroidStdIO.hpp"),
+				});
+				//InConfiguration.Defines.AddRange(new string[] {
+				//	"sprintf_s=sprintf",
+				//	"fopen_s=fopen",
+				//});
 			}
 		}
 
@@ -335,6 +364,14 @@ namespace EternalEngine
 			Android.GlobalSettings.AndroidHome = EternalEngineSettings.AndroidHomePath;
 			Android.GlobalSettings.NdkRoot = EternalEngineSettings.NDKRootPath;
 			Android.GlobalSettings.JavaHome = EternalEngineSettings.JavaHomePath;
+
+			if (InTarget.GetFragment<Platform>() == Platform.agde ||
+				InTarget.GetFragment<Platform>() == Platform.android)
+			{
+				InConfiguration.TargetPath = Path.Combine("[conf.ProjectPath]", "output", "[target.Platform]", "[conf.Name]", "$(PlatformTarget)");
+				InConfiguration.Options.Add(new Options.Agde.General.AndroidGradleBuildDir(@"$(ProjectDir)AndroidBootstrap"));
+				InConfiguration.Options.Add(new Options.Agde.General.AndroidApplicationModule("app"));
+			}
 
 			// Include paths
 			InConfiguration.IncludePaths.AddRange(new string[] {
@@ -436,15 +473,23 @@ namespace EternalEngine
 				}
 			}
 
-			if (ExtensionMethods.IsPC(InTarget.GetFragment<Platform>()) || InTarget.GetFragment<Platform>() == Platform.scarlett)
+			if (InTarget.GetFragment<Platform>() == Platform.agde ||
+				InTarget.GetFragment<Platform>() == Platform.android)
+			{
+				InConfiguration.ForcedIncludes.AddRange(new string[] {
+					EternalEngineBaseProjectUtils.MakeForcedInclude(InTarget, @"$(SolutionDir)eternal-engine-utils\include", "StdLib/Android/AndroidStdIO.hpp"),
+				});
+			}
+
+			if (InTarget.GetFragment<Platform>() != Platform.prospero)
 			{
 				InConfiguration.SourceFilesBuildExcludeRegex.Add(@".*\\main.cpp$");
 			}
-			if (InTarget.GetFragment<Platform>() == Platform.prospero || InTarget.GetFragment<Platform>() == Platform.scarlett)
+			if (!ExtensionMethods.IsPC(InTarget.GetFragment<Platform>()))
 			{
 				InConfiguration.SourceFilesBuildExcludeRegex.Add(@".*\\WinMain.cpp");
 			}
-			if (ExtensionMethods.IsPC(InTarget.GetFragment<Platform>()) || InTarget.GetFragment<Platform>() == Platform.prospero)
+			if (InTarget.GetFragment<Platform>() != Platform.scarlett)
 			{
 				InConfiguration.SourceFilesBuildExcludeRegex.Add(@".*\\XSXMain.cpp");
 			}
