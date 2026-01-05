@@ -466,9 +466,12 @@ namespace EternalEngine
 					});
 					InConfiguration.ReferencesByNuGetPackage.Add("WinPixEventRuntime", EternalEngineSettings.WinPixEventRuntimeVersion);
 					InConfiguration.ReferencesByNuGetPackage.Add("Microsoft.Direct3D.D3D12", EternalEngineSettings.MicrosoftDirect3DD3D12Version);
+					InConfiguration.ReferencesByNuGetPackage.Add("Microsoft.Direct3D.DXC", EternalEngineSettings.MicrosoftDirect3DDXCVersion);
 
 					InConfiguration.TargetCopyFiles.AddRange(new string[] {
-						@"[project.SharpmakeCsPath]\..\packages\WinPixEventRuntime." + EternalEngineSettings.WinPixEventRuntimeVersion + @"\bin\x64\WinPixEventRuntime.dll"
+						@"[project.SharpmakeCsPath]\..\packages\WinPixEventRuntime." + EternalEngineSettings.WinPixEventRuntimeVersion + @"\bin\x64\WinPixEventRuntime.dll",
+						@"[project.SharpmakeCsPath]\..\packages\Microsoft.Direct3D.DXC." + EternalEngineSettings.MicrosoftDirect3DDXCVersion + @"\build\native\bin\x64\dxcompiler.dll",
+						EternalEngineSettings.VulkanPath + @"\Bin\shaderc_shared.dll",
 					});
 				}
 			}
