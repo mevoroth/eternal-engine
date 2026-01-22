@@ -64,10 +64,16 @@ namespace EternalEngine
 				"FBXSDK_SHARED=1",
 			});
 
-			if (ExtensionMethods.IsPC(InTarget.GetFragment<Platform>()) && InTarget.GetFragment<Optimization>() == Optimization.Debug)
+			if (ExtensionMethods.IsPC(InTarget.GetFragment<Platform>()))
 			{
 				InConfiguration.LibraryPaths.AddRange(new string[] {
 					EternalEngineSettings.VulkanPath + @"\Lib",
+				});
+			}
+
+			if (ExtensionMethods.IsPC(InTarget.GetFragment<Platform>()) && InTarget.GetFragment<Optimization>() == Optimization.Debug)
+			{
+				InConfiguration.LibraryPaths.AddRange(new string[] {
 					EternalEngineSettings.FBXSDKPath + @"\lib\vs2022\x64\debug",
 					@"$(SolutionDir)eternal-engine-extern\dxc\lib\x64"
 				});
