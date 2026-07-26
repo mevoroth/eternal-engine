@@ -74,13 +74,13 @@ namespace EternalEngine
 			if (ExtensionMethods.IsPC(InTarget.GetFragment<Platform>()) && InTarget.GetFragment<Optimization>() == Optimization.Debug)
 			{
 				InConfiguration.LibraryPaths.AddRange(new string[] {
-					EternalEngineSettings.FBXSDKPath + @"\lib\vs2022\x64\debug",
+					EternalEngineSettings.FBXSDKPath + @"\lib\x64\debug",
 					@"$(SolutionDir)eternal-engine-extern\dxc\lib\x64"
 				});
 
 				InConfiguration.TargetCopyFiles.AddRange(new string[] {
 					@"[project.SharpmakeCsPath]\..\eternal-engine-extern\dxc\bin\dxil.dll",
-					EternalEngineSettings.FBXSDKPath + @"\lib\vs2022\x64\debug\libfbxsdk.dll",
+					EternalEngineSettings.FBXSDKPath + @"\lib\x64\debug\libfbxsdk.dll",
 				});
 			}
 
