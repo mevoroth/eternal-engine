@@ -460,14 +460,12 @@ namespace EternalEngine
 			if (ExtensionMethods.IsPC(InTarget.GetFragment<Platform>()) && InTarget.GetFragment<Optimization>() == Optimization.Debug)
 			{
 				InConfiguration.LibraryPaths.AddRange(new string[] {
-					EternalEngineSettings.FBXSDKPath + @"\lib\vs2022\x64\debug",
 					EternalEngineSettings.VulkanPath + @"\Lib",
 					@"$(SolutionDir)eternal-engine-extern\dxc\lib\x64"
 				});
 
 				InConfiguration.TargetCopyFiles.AddRange(new string[] {
 					@"[project.SharpmakeCsPath]\..\eternal-engine-extern\dxc\bin\dxil.dll",
-					EternalEngineSettings.FBXSDKPath + @"\lib\vs2022\x64\debug\libfbxsdk.dll",
 				});
 			}
 
@@ -497,6 +495,13 @@ namespace EternalEngine
 						EternalEngineSettings.VulkanPath + @"\Bin\shaderc_shared.dll",
 					});
 				}
+
+				InConfiguration.LibraryPaths.AddRange(new string[] {
+					string.Format(EternalEngineSettings.FBXSDKPath + @"\lib\x64\{0}", InTarget.GetFragment<Optimization>().ToString()),
+				});
+				InConfiguration.TargetCopyFiles.AddRange(new string[] {
+					string.Format(EternalEngineSettings.FBXSDKPath + @"\lib\x64\{0}\libfbxsdk.dll", InTarget.GetFragment<Optimization>().ToString()),
+				});
 			}
 
 			if (EternalEngineBaseProjectUtils.IsAndroid(InTarget))
